@@ -1,2 +1,2 @@
 # ProjetLDP-Arkanoid
-Jeu Arkanoid en c++ avec gui allegro
+Jeu Arkanoid en c++ utilisat la librarie allegro
