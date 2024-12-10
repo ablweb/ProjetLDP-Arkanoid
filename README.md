@@ -1,10 +1,10 @@
 # ProjetLDP-Arkanoid
-Jeu Arkanoid ecrit en c++ avec la librarie allegro.
+Famous Arkanoid game written in c++ using the Allegro library
 
 Installation
 ------------
 
-To build and install zathura using meson's ninja backend:
+To build and start game:
 
     make
     ./arkanoid
