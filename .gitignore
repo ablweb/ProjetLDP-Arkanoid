@@ -1,0 +1,4 @@
+# Build files
+/build/
+*.o
+arkanoid
