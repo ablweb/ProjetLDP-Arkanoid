@@ -1,5 +1,5 @@
-#ifndef GAME_MANAGER_H
-#define GAME_MANAGER_H
+#ifndef GAME_H
+#define GAME_H
 
 #include "input.hpp"
 #include "scene.hpp"
@@ -10,13 +10,12 @@ class InputHandler;
 
 class GameManager {
  private:
-  InputHandler input;
-  Scene mainScene;
-  bool running;
+  InputHandler _input;
+  Scene _mainScene;
+  bool _running;
   Env* _gameEnv;
 
   void gameLoop();
-
  public:
   GameManager(Env* gameEnv);
   ~GameManager();

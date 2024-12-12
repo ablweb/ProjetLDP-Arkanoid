@@ -9,19 +9,21 @@
 #include "env.hpp"
 #include "game.hpp"
 
-int main(int argc, char** argv) {
-  Env gameEnv = Env();
+int main() {
+  Env* gameEnv;
   // check if any errors occured during allegro environment initialization
   try {
-    gameEnv.init();
+    gameEnv = new Env();
   } catch (const std::runtime_error& err) {
     std::cerr << "Allegro: " << err.what() << std::endl;
     return 1;
   }
 
-  GameManager* arkanoidGame = new GameManager(&gameEnv);
+  GameManager* arkanoidGame = new GameManager(gameEnv);
 
   delete arkanoidGame;
+  delete gameEnv;
   arkanoidGame = nullptr;
+  gameEnv = nullptr;
   return 0;
 }
