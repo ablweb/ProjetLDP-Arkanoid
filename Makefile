@@ -8,10 +8,11 @@ EXE     := $(BINDIR)$(NAME)
 SFILES  := cpp
 OFILES  := o
 CC      := g++
-CFLAGS  := -Wall -Wextra -O2 -std=gnu++20 -Wpedantic -march=native -Wnull-dereference -Winline -Wconversion -g -fsanitize=address,undefined
+CFLAGS  := -Wall -Wextra -O2 -std=gnu++20 -Wpedantic -march=native -Wnull-dereference -Winline -Wconversion -g 
+#CFLAGS  += -fsanitize=address
 CFLAGS 	+= $(shell pkg-config allegro-5 allegro_primitives-5 allegro_font-5 --cflags | sed 's/-I/-isystem/g')
 
-LIBS    := -fsanitize=address,undefined
+#LIBS    += -fsanitize=address
 LIBS 		+= $(shell pkg-config allegro-5 allegro_primitives-5 allegro_font-5 allegro_ttf-5 --libs) -lallegro_main
 
 SOURCES := $(shell find $(SRCDIR) -name "*.$(SFILES)")
