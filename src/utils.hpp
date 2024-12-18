@@ -3,6 +3,14 @@
 
 #include <allegro5/color.h>
 
+namespace RETURN_CODE {
+enum {
+  SUCCES,
+  ENVIRONMENT_SETUP_FAIL
+};
+}; // namespace RETURN
+
+
 namespace COLORS {
 const ALLEGRO_COLOR BLACK = al_map_rgb(0, 0, 0);
 const ALLEGRO_COLOR WHITE = al_map_rgb(255, 255, 255);

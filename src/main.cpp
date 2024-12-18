@@ -1,29 +1,26 @@
-#include <allegro5/allegro.h>
-#include <allegro5/allegro_font.h>
-#include <allegro5/allegro_ttf.h>
-#include <allegro5/display.h>
-
 #include <iostream>
 #include <stdexcept>
 
 #include "env.hpp"
 #include "game.hpp"
+#include "utils.hpp"
 
 int main() {
+  using namespace RETURN_CODE;
   Env* gameEnv;
   // check if any errors occured during allegro environment initialization
   try {
     gameEnv = new Env();
   } catch (const std::runtime_error& err) {
     std::cerr << "Allegro: " << err.what() << std::endl;
-    return 1;
+    return ENVIRONMENT_SETUP_FAIL;
   }
 
   GameManager* arkanoidGame = new GameManager(gameEnv);
 
   delete arkanoidGame;
-  delete gameEnv;
   arkanoidGame = nullptr;
-  gameEnv = nullptr;
-  return 0;
+  // gameEnv is not deleted becaus its ownership is moved to a unique_ptr in GameManager 
+  // TODO change that
+  return SUCCES;
 }

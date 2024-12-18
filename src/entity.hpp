@@ -27,11 +27,17 @@ public:
 
 class TestRectangle : virtual public DynamiqueEntity {
 private:
-  tpl _position;
-  float _width;
-  float _height;
-  ALLEGRO_COLOR _color;
+  tpl pos;
+  float w;
+  float h;
+  ALLEGRO_COLOR col;
 public:
+  float x();
+  float y();
+  float width();
+  float height();
+  ALLEGRO_COLOR color();
+
   TestRectangle(tpl position, float width, float height, ALLEGRO_COLOR color);
   ~TestRectangle();
   void draw();

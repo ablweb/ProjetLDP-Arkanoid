@@ -2,21 +2,24 @@
 #define GAME_H
 
 #include "input.hpp"
-#include "scene.hpp"
+#include "renderer.hpp"
+#include "level.hpp"
+#include <memory>
 
 class Env;
-class Scene;
+class Renderer;
 class InputHandler;
 
 class GameManager {
- private:
-  InputHandler _input;
-  Scene _mainScene;
-  bool _running;
-  Env* _gameEnv;
+private:
+  std::unique_ptr<Env> gameEnv;
+  std::unique_ptr<InputHandler> input;
+  std::unique_ptr<Renderer> render;
+  std::shared_ptr<LevelManager> level;
 
-  void gameLoop();
- public:
+  bool running;
+  void run();
+public:
   GameManager(Env* gameEnv);
   ~GameManager();
 };
