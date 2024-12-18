@@ -9,9 +9,12 @@
 class InputHandler {
 private:
 public:
-  void handle(ALLEGRO_EVENT& event,std::shared_ptr<LevelManager> level, bool& running);
-  InputHandler();
-  ~InputHandler();
+  InputHandler();  // Constructeur
+  ~InputHandler(); // Destructeur 
+
+// Gestion des événements utilisateur
+void handle(ALLEGRO_EVENT& event,std::shared_ptr<LevelManager> level, bool& running);
+
 };
 
 #endif

@@ -47,16 +47,40 @@ void Env::createAssets() {
   DISPLAY = al_create_display(DISPLAY_WIDTH, DISPLAY_HEIGHT);
   if (!DISPLAY) throw std::runtime_error("Error while creating display");
   FONT = al_load_ttf_font(FONT_PATH, FONT_SIZE, 0);
+
   if (!FONT) throw std::runtime_error("Error while loading font");
   QUEUE = al_create_event_queue();
+
   if (!QUEUE) throw std::runtime_error("Error while creating queue");
   TIMER = al_create_timer(TIMER_RATE);
+
   if (!TIMER) throw std::runtime_error("Error while creating timer");
 }
 
 void Env::registerEvents() {
+  // Enregistrement des sources d'événements
   al_register_event_source(QUEUE, al_get_keyboard_event_source());
   al_register_event_source(QUEUE, al_get_display_event_source(DISPLAY));
   al_register_event_source(QUEUE, al_get_timer_event_source(TIMER));
 }
 
+void Env::cleanup() {
+  // Libération des ressources dans l'ordre inverse de leur création
+  if (TIMER) {
+    al_destroy_TIMER(TIMER);
+    TIMER = nullptr;
+  }
+  if (QUEUE) {
+    al_destroy_eventQUEUE(QUEUE);
+    QUEUE = nullptr;
+  }
+  if (FONT) {
+    al_destroyFONT(FONT);
+    FONT = nullptr;
+  }
+  if (DISPLAY) {
+    al_destroyDISPLAY(DISPLAY);
+    DISPLAY = nullptr;
+  }
+  al_uninstall_keyboard();
+}

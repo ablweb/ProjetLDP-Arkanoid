@@ -6,16 +6,18 @@
 struct tpl {
   float x=0, y=0;
 };
-
+// Classe abstraite de base pour toutes les entités
 class Entity {
 protected:
   Entity() = default;
   Entity(const Entity&) = default;
 public:
-  virtual void draw() = 0;
-  virtual ~Entity() = default;
+  virtual void draw() = 0;    // Méthode pour dessiner l'entité
+  virtual void update() = 0;    // Méthode à redéfinir pour les entités dynamiques
+  virtual ~Entity() = default; // Destructeur virtuel pour la gestion des entités dérivées
 };
 
+// Classe abstraite pour les entités dynamiques (qui peuvent se déplacer)
 class DynamiqueEntity : public Entity {
 protected:
   DynamiqueEntity() = default;
@@ -27,10 +29,10 @@ public:
 
 class TestRectangle : virtual public DynamiqueEntity {
 private:
-  tpl pos;
-  float w;
-  float h;
-  ALLEGRO_COLOR col;
+  tpl pos; // Position du rectangle
+  float w;  // width du rectangle
+  float h;  // Height du rectangle
+  ALLEGRO_COLOR col; // Couleur du rectangle
 public:
   float x();
   float y();

@@ -13,6 +13,7 @@
 #include "level.hpp"
 #include "renderer.hpp"
 
+// Constructeur
 GameManager::GameManager(Env* gameEnv)
   : gameEnv(gameEnv),
     input(std::make_unique<InputHandler>()),
@@ -23,9 +24,10 @@ GameManager::GameManager(Env* gameEnv)
   running = true;
   run(); 
 }
-
+// Destructeur
 GameManager::~GameManager() {}
 
+// Méthode pour démarrer le jeu
 void GameManager::run() {
   while (running) {
     ALLEGRO_EVENT event;

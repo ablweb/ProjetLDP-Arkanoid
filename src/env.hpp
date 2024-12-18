@@ -8,7 +8,7 @@
 
 class Env {
 private:
-  bool _isInit;
+  bool _isInit;  // Indique si l'environnement est initialisé
   void initAddons();
   void createAssets();
   void registerEvents();
@@ -19,10 +19,10 @@ public:
   const char* FONT_PATH = "resources/SourceCodePro-Regular.ttf";
   const double TIMER_RATE = 1.0/60;
 
-  ALLEGRO_FONT* FONT;
-  ALLEGRO_DISPLAY* DISPLAY;
-  ALLEGRO_EVENT_QUEUE* QUEUE;
-  ALLEGRO_TIMER* TIMER;
+  ALLEGRO_FONT* FONT;  // Police d'affichage
+  ALLEGRO_DISPLAY* DISPLAY; // Fenêtre d'affichage
+  ALLEGRO_EVENT_QUEUE* QUEUE;  // File d'attente d'événements
+  ALLEGRO_TIMER* TIMER;  // Minuterie
 
   bool isInitialized();
   Env();
