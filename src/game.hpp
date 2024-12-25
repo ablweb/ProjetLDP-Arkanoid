@@ -1,27 +1,25 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include "input.hpp"
-#include "renderer.hpp"
-#include "level.hpp"
 #include <memory>
 
 class Env;
-class Renderer;
-class InputHandler;
+class Controller;
 
-class GameManager {
+class GameEngine {
 private:
-  std::unique_ptr<Env> gameEnv;
-  std::unique_ptr<InputHandler> input;
-  std::unique_ptr<Renderer> render;
-  std::shared_ptr<LevelManager> level;
+  std::unique_ptr<Env> env;
+  std::unique_ptr<Controller> controller;
+
+  void checkEnv();
+  void generateController();
 
   bool running;
   void run();
 public:
-  GameManager(Env* gameEnv);
-  ~GameManager();
+  GameEngine(Env* gameEnv);
+  GameEngine(std::unique_ptr<Env> gameEnv);
+  ~GameEngine();
 };
 
 #endif

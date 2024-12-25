@@ -29,7 +29,6 @@ Env::~Env() {
 bool Env::isInitialized() { return _isInit; }
 
 void Env::initAddons() {
-  // initialize addons
   if (!al_init())
     throw std::runtime_error("Error while initializing Allegro\n");
   if (!al_init_primitives_addon()) 
@@ -43,7 +42,6 @@ void Env::initAddons() {
 }
 
 void Env::createAssets() {
-  // initialize assets
   DISPLAY = al_create_display(DISPLAY_WIDTH, DISPLAY_HEIGHT);
   if (!DISPLAY) throw std::runtime_error("Error while creating display");
   FONT = al_load_ttf_font(FONT_PATH, FONT_SIZE, 0);
@@ -59,4 +57,3 @@ void Env::registerEvents() {
   al_register_event_source(QUEUE, al_get_display_event_source(DISPLAY));
   al_register_event_source(QUEUE, al_get_timer_event_source(TIMER));
 }
-

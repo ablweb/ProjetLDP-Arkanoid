@@ -3,13 +3,40 @@
 
 #include <allegro5/color.h>
 
+#include <memory>
+#include <vector>
+
+template <typename T>
+class Listener {
+public:
+  virtual void onNotify(T*)=0;
+};
+
+template <typename T>
+class Notifier {
+  std::vector<std::weak_ptr<Listener<T>>> listeners;
+public:
+  void registerListener(std::weak_ptr<Listener<T>> l) {
+    listeners.push_back(l);
+  }
+  void notifyListener(T* e) {
+    for (auto it = listeners.begin(); it != listeners.end(); ) {
+      if (auto sl = it->lock()) {
+        sl->onNotify(e);
+        ++it;
+      } else {
+        it = listeners.erase(it);
+      }
+    }
+  }
+};
+
 namespace RETURN_CODE {
 enum {
   SUCCES,
   ENVIRONMENT_SETUP_FAIL
 };
 }; // namespace RETURN
-
 
 namespace COLORS {
 const ALLEGRO_COLOR BLACK = al_map_rgb(0, 0, 0);

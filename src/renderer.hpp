@@ -1,17 +1,22 @@
 #ifndef RENDERER_H
 #define RENDERER_H
 
-#include <memory>
+#include "utils.hpp"
+#include "entity.hpp"
 
 class TestRectangle;
 
-class Renderer {
+class Renderer : public Listener<Entity> {
 private:
+  void onNotify(Entity*) override;
 public:
-  void drawTestRect(std::shared_ptr<TestRectangle> testRect);
   Renderer();
   ~Renderer();
   void refresh();
+
+  void renderType(Entity*);
+  void render(TestRectangle*);
+  // add new render methodes with other parameters
 };
 
 #endif
