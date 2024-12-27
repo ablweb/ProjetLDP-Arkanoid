@@ -1,16 +1,19 @@
 #ifndef RENDERER_H
 #define RENDERER_H
 
-#include "utils.hpp"
-#include "entity.hpp"
+#include <memory>
 
+class Entity;
 class TestRectangle;
+class Level;
 
-class Renderer : public Listener<Entity> {
+typedef std::shared_ptr<const Level> ConstLevelSPtr;
+
+class Renderer {
 private:
-  void onNotify(Entity*) override;
+  ConstLevelSPtr lvl;
 public:
-  Renderer();
+  Renderer(ConstLevelSPtr);
   ~Renderer();
   void refresh();
 

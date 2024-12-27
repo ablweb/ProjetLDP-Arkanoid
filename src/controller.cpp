@@ -9,30 +9,28 @@
 #include "stateManager.hpp"
 
 Controller::Controller(StateManagerUPtr stateManager,
-                       RendererSPtr renderer)
+                       RendererUPtr renderer,
+                       LevelSPtr level)
   : sm(std::move(stateManager)),
-    rndr(renderer) {
-  sm->registerListener(rndr);
-}
+    rndr(std::move(renderer)),
+    lvl(level) {}
 
 Controller::~Controller() {}
 
 void Controller::handleInput(const ALLEGRO_EVENT& event) {
-  if (event.type == ALLEGRO_EVENT_KEY_CHAR) {
-    switch (event.keyboard.keycode) {
-      case ALLEGRO_KEY_LEFT:
-        std::cerr << "LEFT PRESSED";
-        sm->movePaletteLeft();
-        break;
-      case ALLEGRO_KEY_RIGHT:
-        std::cerr << "RIGHT PRESSED";
-        sm->movePaletteRigth();
-        break;
-      default: break;
-    }
+  switch (event.keyboard.keycode) {
+    case ALLEGRO_KEY_LEFT:
+      std::cerr << "|Controller::handleInput() -> KEY_LEFT\n";
+      sm->movePaletteLeft();
+      break;
+    case ALLEGRO_KEY_RIGHT:
+      std::cerr << "|Controller::handleInput() -> KEY_RIGHT\n";
+      sm->movePaletteRigth();
+      break;
+    default: break;
   }
 }
 
-void Controller::render() {
-  rndr->render(sm->getTestRect().get());
+void Controller::refreshDisplay() {
+  rndr->refresh();
 }

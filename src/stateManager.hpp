@@ -3,29 +3,22 @@
 
 #include <memory>
 
-#include "utils.hpp"
-
 class Entity;
-class TestRectangle;
+class Level;
 
-typedef std::shared_ptr<TestRectangle> TestRectSPtr ;
+typedef std::shared_ptr<Level> LevelSPtr;
 
-class StateManager : public Notifier<Entity> {
+class StateManager {
 private:
-  // Here add all object of game, e.g. Brick, Ball, Palette, ...
-  TestRectSPtr testRect;
+  LevelSPtr lvl;
 public:
-  StateManager();
+  StateManager(LevelSPtr);
   ~StateManager();
 
-  // Here add all methode that the controller can call
+  // Here add all methode to change state of game assets
   void movePaletteRigth();
   void movePaletteLeft();
   void update();
-
-  // Here add the inteface for the view acces
-  TestRectSPtr getTestRect() const;
 };
-
 
 #endif

@@ -2,17 +2,13 @@
 #define ENTITY_H
 
 #include <allegro5/color.h>
-
-struct tpl {
-  float x=0, y=0;
-};
+#include "utils.hpp"
 
 class Entity {
 protected:
   Entity() = default;
   Entity(const Entity&) = default;
 public:
-  virtual void draw() = 0;
   virtual ~Entity() = default;
 };
 
@@ -40,7 +36,6 @@ public:
 
   TestRectangle(tpl position, float width, float height, ALLEGRO_COLOR color);
   ~TestRectangle();
-  void draw();
   void move(int dx, int dy);
 };
 

@@ -6,22 +6,24 @@
 
 class StateManager;
 class Renderer;
+class Level;
 
 typedef std::unique_ptr<StateManager> StateManagerUPtr ;
-typedef std::shared_ptr<Renderer> RendererSPtr ;
+typedef std::unique_ptr<Renderer> RendererUPtr ;
+typedef std::shared_ptr<Level> LevelSPtr;
 
 class Controller {
 private:
-  StateManagerUPtr  sm;
-  RendererSPtr  rndr;
+  StateManagerUPtr sm;
+  RendererUPtr rndr;
+  LevelSPtr lvl;
 
 public:
-  Controller(StateManagerUPtr stateManager,
-             RendererSPtr renderer);
+  Controller(StateManagerUPtr,RendererUPtr,LevelSPtr);
   ~Controller();
 
-  void handleInput(const ALLEGRO_EVENT& event);
-  void render();
+  void handleInput(const ALLEGRO_EVENT&);
+  void refreshDisplay();
 };
 
 #endif

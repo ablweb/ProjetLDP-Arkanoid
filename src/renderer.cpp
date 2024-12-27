@@ -1,22 +1,26 @@
 #include "renderer.hpp"
 
 #include <allegro5/allegro_primitives.h>
+#include <iostream>
+#include <tuple>
 
 #include "entity.hpp"
+#include "level.hpp"
 
-Renderer::Renderer() {}
+Renderer::Renderer(ConstLevelSPtr level)
+  : lvl(level) {}
 
 Renderer::~Renderer() {}
 
 void Renderer::refresh() {
-}
-
-void Renderer::onNotify(Entity* entity) {
-  renderType(entity);
+  // https://stackoverflow.com/questions/1198260/how-can-you-iterate-over-the-elements-of-an-stdtuple
+  std::apply([this](const auto&... entity)
+             {((render(entity.get())), ...);}, lvl->all());
 }
 
 void Renderer::renderType(Entity* entity) {
-  if (auto* testRect = dynamic_cast<TestRectangle*>(entity)) {
+  if (auto testRect = dynamic_cast<TestRectangle*>(entity)) {
+    std::cerr << "|Renderer::renderType() -> TestRectangle\n";
     render(testRect);
   }
 }

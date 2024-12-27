@@ -48,7 +48,7 @@ void Env::createAssets() {
   if (!FONT) throw std::runtime_error("Error while loading font");
   QUEUE = al_create_event_queue();
   if (!QUEUE) throw std::runtime_error("Error while creating queue");
-  TIMER = al_create_timer(TIMER_RATE);
+  TIMER = al_create_timer(FRAME_RATE);
   if (!TIMER) throw std::runtime_error("Error while creating timer");
 }
 

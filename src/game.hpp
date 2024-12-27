@@ -6,6 +6,8 @@
 class Env;
 class Controller;
 
+typedef std::unique_ptr<Env> EnvUPtr ;
+
 class GameEngine {
 private:
   std::unique_ptr<Env> env;
@@ -17,8 +19,8 @@ private:
   bool running;
   void run();
 public:
-  GameEngine(Env* gameEnv);
-  GameEngine(std::unique_ptr<Env> gameEnv);
+  GameEngine(Env*);
+  GameEngine(EnvUPtr);
   ~GameEngine();
 };
 
