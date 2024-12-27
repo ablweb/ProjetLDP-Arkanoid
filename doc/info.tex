@@ -1,0 +1,137 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{hyperref}
+
+% Margins
+\topmargin=-0.45in
+\evensidemargin=0in
+\oddsidemargin=0in
+\textwidth=6.5in
+\textheight=9.0in
+\headsep=0.25in
+
+\title{Game Structure Overview}
+\author{}
+\date{}
+
+
+\begin{document}
+
+\maketitle
+
+\section{Moteur de jeu}
+Le \textbf{Moteur de jeu} est le composant centrale qui gére le boucle de jeu et coordone les composant de la structure MVC, Modéle, View, Controlleur.
+
+\begin{itemize}
+    \item Boucle de jeu, et son arret.
+    \item Crée composant MVC et les lie entre eux.
+\end{itemize}
+
+\begin{center}
+    \begin{minipage}[c]{0.5\textwidth}
+        \begin{verbatim}
+class GameEngine
+    render = new Renderer()
+    gameState = new GameStateHandler()
+    controller = new Controller()
+    fun run()
+        while (running)
+            processInput()
+            updateGame()
+            refresh()
+    end run
+end GameEngine
+        \end{verbatim}
+    \end{minipage}
+\end{center}
+
+\section{Model}
+Le \textbf{Model} represente le noyau de la logic de jeu, pour que le controlleur ai acces au composant du model, on utilise une class de type facade StateManager.
+
+\subsection{Level}
+Level, class de type container, contient tout les elements de jeu (Palette, Brick, TextContainer, etc).
+Methode all(), renvoie un std::tuple contenant tout les elements du level.
+Utiliser std::apply pour iterer sur le tuple.
+\url{https://stackoverflow.com/questions/1198260/how-can-you-iterate-over-the-elements-of-an-stdtuple}
+\subsection{StateManager}
+Contient les mothodes pour modifier les composant de level, contient un pointeur vers level.
+\begin{center}
+    \begin{minipage}[c]{0.5\textwidth}
+        \begin{verbatim}
+class Paddle
+    int pos
+    moveLeft(dx, dy)
+end class
+class StateManager
+    movePaddleRight()
+    ...
+end class
+class Level
+    Paddle
+    ...
+end class
+        \end{verbatim}
+    \end{minipage}
+\end{center}
+
+\section{Controlleur}
+Contient un StateManageur, Level et Renderer, recupere le input utilisateur, modifie les objets de jeu et render le resultat a chaque frame
+
+\begin{center}
+    \begin{minipage}[c]{0.5\textwidth}
+        \begin{verbatim}
+class Controller {
+    int getInput() {
+        if (keyPressed(LEFT)) return LEFT;
+        if (keyPressed(RIGHT)) return RIGHT;
+        \end{verbatim}
+    \end{minipage}
+\end{center}
+
+\section{Inheritance}
+Inheritance is a core concept in object-oriented programming where a class (child) derives from another class (parent) and inherits its properties and methods. This establishes an "is-a" relationship between the child and parent classes. However, inheritance can lead to tightly coupled code and deep hierarchies, making the system harder to maintain and extend.
+
+\begin{center}
+    \begin{minipage}[c]{0.5\textwidth}
+        \begin{verbatim}
+class Animal {
+public:
+    virtual void sound() = 0;
+};
+
+class Dog : public Animal {
+public:
+    void sound() override { std::cout << "Bark"; }
+};
+        \end{verbatim}
+    \end{minipage}
+\end{center}
+
+\section{Composition}
+Composition is a design principle where objects are composed of other objects to achieve complex functionality. This follows the "has-a" relationship, where one class contains another. Composition provides more flexibility, as components can be easily swapped or modified at runtime without modifying the entire class structure.
+
+\begin{center}
+    \begin{minipage}[c]{0.5\textwidth}
+        \begin{verbatim}
+class SoundBehavior {
+public:
+    virtual void sound() = 0;
+};
+
+class BarkBehavior : public SoundBehavior {
+public:
+    void sound() override { std::cout << "Bark"; }
+};
+
+class Dog {
+private:
+    SoundBehavior* soundBehavior;
+public:
+    Dog(SoundBehavior* sb) : soundBehavior(sb) {}
+    void makeSound() { soundBehavior->sound(); }
+};
+        \end{verbatim}
+    \end{minipage}
+\end{center}
+
+\end{document}

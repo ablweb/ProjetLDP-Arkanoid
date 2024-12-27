@@ -16,8 +16,8 @@ public:
   ~StateManager();
 
   // Here add all methode to change state of game assets
-  void movePaletteRigth();
-  void movePaletteLeft();
+  void movePaddleRight();
+  void movePaddleLeft();
   void update();
 };
 

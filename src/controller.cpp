@@ -21,11 +21,11 @@ void Controller::handleInput(const ALLEGRO_EVENT& event) {
   switch (event.keyboard.keycode) {
     case ALLEGRO_KEY_LEFT:
       std::cerr << "|Controller::handleInput() -> KEY_LEFT\n";
-      sm->movePaletteLeft();
+      sm->movePaddleLeft();
       break;
     case ALLEGRO_KEY_RIGHT:
       std::cerr << "|Controller::handleInput() -> KEY_RIGHT\n";
-      sm->movePaletteRigth();
+      sm->movePaddleLeft();
       break;
     default: break;
   }

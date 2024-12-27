@@ -10,10 +10,10 @@ StateManager::StateManager(LevelSPtr level)
 
 StateManager::~StateManager() {}
 
-void StateManager::movePaletteRigth() {
+void StateManager::movePaddleRight() {
   lvl->testRect->move(10, 0);
 }
-void StateManager::movePaletteLeft() {
+void StateManager::movePaddleLeft() {
   lvl->testRect->move(-10, 0);
 }
 void StateManager::update() {
