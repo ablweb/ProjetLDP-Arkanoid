@@ -1,16 +1,14 @@
 #include "entity.hpp"
 
-#include <allegro5/drawing.h>
 #include <allegro5/allegro_primitives.h>
+#include <allegro5/drawing.h>
 
-/////////////////////////////////////////////////////////
-//  TestRectangel                                      //
-/////////////////////////////////////////////////////////
-TestRectangle::TestRectangle(tpl position, float width, float height, ALLEGRO_COLOR color)
-  :pos(position),
-   w(width),
-   h(height),
-   col(color) {}
+// -------------------------------------------------------------------------
+// TestRectangle
+// -------------------------------------------------------------------------
+TestRectangle::TestRectangle(tpl position, float width, float height,
+                             ALLEGRO_COLOR color)
+    : pos(position), w(width), h(height), col(color) {}
 
 TestRectangle::~TestRectangle() {}
 

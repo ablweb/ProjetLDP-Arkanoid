@@ -1,7 +1,7 @@
 #include "env.hpp"
 
-#include <allegro5/allegro_primitives.h>
 #include <allegro5/allegro_font.h>
+#include <allegro5/allegro_primitives.h>
 #include <allegro5/allegro_ttf.h>
 #include <allegro5/display.h>
 #include <allegro5/events.h>
@@ -31,7 +31,7 @@ bool Env::isInitialized() { return _isInit; }
 void Env::initAddons() {
   if (!al_init())
     throw std::runtime_error("Error while initializing Allegro\n");
-  if (!al_init_primitives_addon()) 
+  if (!al_init_primitives_addon())
     throw std::runtime_error("Error while initializing primitives addon\n");
   if (!al_init_font_addon())
     throw std::runtime_error("Error while initializing font addon\n");

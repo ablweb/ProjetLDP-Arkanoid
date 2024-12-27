@@ -10,9 +10,10 @@ class Level;
 typedef std::shared_ptr<const Level> ConstLevelSPtr;
 
 class Renderer {
-private:
+ private:
   ConstLevelSPtr lvl;
-public:
+
+ public:
   Renderer(ConstLevelSPtr);
   ~Renderer();
   void refresh();

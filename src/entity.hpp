@@ -2,32 +2,36 @@
 #define ENTITY_H
 
 #include <allegro5/color.h>
+
 #include "utils.hpp"
 
 class Entity {
-protected:
+ protected:
   Entity() = default;
   Entity(const Entity&) = default;
-public:
+
+ public:
   virtual ~Entity() = default;
 };
 
 class DynamiqueEntity : public Entity {
-protected:
+ protected:
   DynamiqueEntity() = default;
   DynamiqueEntity(const DynamiqueEntity&) = default;
-public:
+
+ public:
   virtual void move(int dx, int dy) = 0;
   virtual ~DynamiqueEntity() = default;
 };
 
 class TestRectangle : virtual public DynamiqueEntity {
-private:
+ private:
   tpl pos;
   float w;
   float h;
   ALLEGRO_COLOR col;
-public:
+
+ public:
   float x();
   float y();
   float width();

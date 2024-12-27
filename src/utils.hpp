@@ -9,21 +9,22 @@
 
 template <typename T>
 class Listener {
-public:
-  virtual void onNotify(T*)=0;
+ public:
+  virtual void onNotify(T*) = 0;
 };
 
 template <typename T>
 class Notifier {
   std::vector<std::weak_ptr<Listener<T>>> listeners;
-public:
+
+ public:
   void registerListener(std::weak_ptr<Listener<T>> l) {
     std::cerr << "|Listener::registerListener() -> Registered New Listener\n";
     listeners.push_back(l);
   }
   void notifyListeners(T* e) {
     std::cerr << "|Listener::norifyListeners()\n";
-    for (auto it = listeners.begin(); it != listeners.end(); ) {
+    for (auto it = listeners.begin(); it != listeners.end();) {
       if (auto sl = it->lock()) {
         sl->onNotify(e);
         ++it;
@@ -35,15 +36,12 @@ public:
 };
 
 struct tpl {
-  float x=0, y=0;
+  float x = 0, y = 0;
 };
 
 namespace RETURN_CODE {
-enum {
-  SUCCES,
-  ENVIRONMENT_SETUP_FAIL
-};
-}; // namespace RETURN
+enum { SUCCES, ENVIRONMENT_SETUP_FAIL };
+};  // namespace RETURN_CODE
 
 namespace COLORS {
 const ALLEGRO_COLOR BLACK = al_map_rgb(0, 0, 0);

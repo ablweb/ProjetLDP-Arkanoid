@@ -9,9 +9,10 @@ class Level;
 typedef std::shared_ptr<Level> LevelSPtr;
 
 class StateManager {
-private:
+ private:
   LevelSPtr lvl;
-public:
+
+ public:
   StateManager(LevelSPtr);
   ~StateManager();
 

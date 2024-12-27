@@ -7,17 +7,18 @@
 #include <allegro5/timer.h>
 
 class Env {
-private:
+ private:
   bool _isInit;
   void initAddons();
   void createAssets();
   void registerEvents();
-public:
+
+ public:
   const int DISPLAY_WIDTH = 500;
   const int DISPLAY_HEIGHT = 500;
   const int FONT_SIZE = 20;
   const char* FONT_PATH = "resources/SourceCodePro-Regular.ttf";
-  const double FRAME_RATE = 1.0/60;
+  const double FRAME_RATE = 1.0 / 60;
 
   ALLEGRO_FONT* FONT;
   ALLEGRO_DISPLAY* DISPLAY;

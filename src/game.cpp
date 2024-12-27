@@ -9,26 +9,24 @@
 #include <stdexcept>
 #include <utility>
 
-#include "env.hpp"
 #include "controller.hpp"
-#include "stateManager.hpp"
-#include "renderer.hpp"
+#include "env.hpp"
 #include "level.hpp"
+#include "renderer.hpp"
+#include "stateManager.hpp"
 
-GameEngine::GameEngine(EnvUPtr gameEnv)
-  : env(std::move(gameEnv)) {
+GameEngine::GameEngine(EnvUPtr gameEnv) : env(std::move(gameEnv)) {
   checkEnv();
   generateController();
   running = true;
-  run(); 
+  run();
 }
 
-GameEngine::GameEngine(Env* gameEnv)
-  : env(gameEnv) {
+GameEngine::GameEngine(Env* gameEnv) : env(gameEnv) {
   checkEnv();
   generateController();
   running = true;
-  run(); 
+  run();
 }
 
 GameEngine::~GameEngine() {}
@@ -42,7 +40,8 @@ void GameEngine::generateController() {
   auto lvl = std::make_shared<Level>();
   auto sm = std::make_unique<StateManager>(lvl);
   auto rndr = std::make_unique<Renderer>(lvl);
-  controller = std::make_unique<Controller>(std::move(sm),std::move(rndr),lvl);
+  controller =
+      std::make_unique<Controller>(std::move(sm), std::move(rndr), lvl);
 }
 
 void GameEngine::run() {
