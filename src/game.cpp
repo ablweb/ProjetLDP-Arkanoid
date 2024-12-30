@@ -46,16 +46,20 @@ void GameEngine::generateController() {
 
 void GameEngine::run() {
   al_start_timer(env->TIMER);
+  controller->loadLevel();
   while (running) {
     ALLEGRO_EVENT event;
     al_wait_for_event(env->QUEUE, &event);
+    if (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
+      running = false;
+    }
     if (event.type == ALLEGRO_EVENT_KEY_CHAR) {
-      controller->handleInput(event);
+      if (controller->handleInput(event) == -1) {
+        running = false;
+      }
     }
     if (event.type == ALLEGRO_EVENT_TIMER) {
-      al_clear_to_color(al_map_rgb(255, 255, 255));
       controller->refreshDisplay();
-      al_flip_display();
     }
   }
 }

@@ -11,6 +11,8 @@
 
 #include <stdexcept>
 
+#include "config.hpp"
+
 Env::Env() : FONT(nullptr), DISPLAY(nullptr), QUEUE(nullptr), TIMER(nullptr) {
   initAddons();
   createAssets();

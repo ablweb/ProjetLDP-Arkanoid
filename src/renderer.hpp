@@ -4,8 +4,9 @@
 #include <memory>
 
 class Entity;
-class TestRectangle;
 class Level;
+class BrickHolder;
+class Brick;
 
 typedef std::shared_ptr<const Level> ConstLevelSPtr;
 
@@ -18,8 +19,10 @@ class Renderer {
   ~Renderer();
   void refresh();
 
+  void drawnBackground();
   void renderType(Entity*);
-  void render(TestRectangle*);
+  void render(BrickHolder*);
+  void render(Brick*);
   // add new render methodes with other parameters
 };
 

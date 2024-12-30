@@ -3,7 +3,10 @@
 
 #include <allegro5/events.h>
 
+#include <fstream>
+#include <map>
 #include <memory>
+#include <vector>
 
 class StateManager;
 class Renderer;
@@ -19,12 +22,18 @@ class Controller {
   RendererUPtr rndr;
   LevelSPtr lvl;
 
+  std::map<std::string,std::string> levelFiles;
+  void registerLevelFiles();
+  bool isValidLevelFormat(const std::string& levelPath);
+  void loadJsonLevel(const std::string& levelPath);
+  void loadDefaultLevel();
  public:
   Controller(StateManagerUPtr, RendererUPtr, LevelSPtr);
   ~Controller();
 
-  void handleInput(const ALLEGRO_EVENT&);
+  int handleInput(const ALLEGRO_EVENT&);
   void refreshDisplay();
+  void loadLevel();
 };
 
 #endif

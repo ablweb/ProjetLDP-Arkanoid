@@ -5,6 +5,8 @@
 
 #include <iostream>
 #include <memory>
+#include <string>
+#include <unordered_map>
 #include <vector>
 
 template <typename T>
@@ -44,15 +46,88 @@ enum { SUCCES, ENVIRONMENT_SETUP_FAIL };
 };  // namespace RETURN_CODE
 
 namespace COLORS {
-const ALLEGRO_COLOR BLACK = al_map_rgb(0, 0, 0);
-const ALLEGRO_COLOR WHITE = al_map_rgb(255, 255, 255);
-const ALLEGRO_COLOR RED = al_map_rgb(255, 0, 0);
-const ALLEGRO_COLOR GREY = al_map_rgb(200, 200, 200);
-const ALLEGRO_COLOR GREEN = al_map_rgb(0, 255, 0);
-const ALLEGRO_COLOR YELLOW = al_map_rgb(255, 255, 0);
-const ALLEGRO_COLOR PINK = al_map_rgb(200, 150, 167);
-const ALLEGRO_COLOR MAGENTA = al_map_rgb(255, 0, 255);
-const ALLEGRO_COLOR BLUE = al_map_rgb(0, 0, 255);
+const ALLEGRO_COLOR BLACK    = al_map_rgb(0,0,0);
+const ALLEGRO_COLOR WHITE    = al_map_rgb(255,255,255);
+const ALLEGRO_COLOR ORANGE   = al_map_rgb(255,165,0);
+const ALLEGRO_COLOR CYAN     = al_map_rgb(0,255,255);
+const ALLEGRO_COLOR GREEN    = al_map_rgb(0,255,0);
+const ALLEGRO_COLOR RED      = al_map_rgb(255,0,0);
+const ALLEGRO_COLOR BLUE     = al_map_rgb(0,0,255);
+const ALLEGRO_COLOR MAGENTA  = al_map_rgb(255,0,255);
+const ALLEGRO_COLOR YELLOW   = al_map_rgb(255,255,0);
+const ALLEGRO_COLOR YELLOW_B = al_map_rgb(239,191,4);
+const ALLEGRO_COLOR GREY     = al_map_rgb(212,212,212);
+const ALLEGRO_COLOR GREY_B   = al_map_rgb(178,178,178);
 };  // namespace COLORS
+
+namespace BRICK_CONST {
+constexpr float width = 40.0;
+constexpr float height = 20.0; 
+constexpr float spacing = 3.0;
+enum colorType {
+  white=50,
+  orange=60,
+  cyan=70,
+  green=80,
+  red=90,
+  blue=100,
+  magenta=110,
+  yellow=120,
+  silver=200,
+  gold=-1
+};
+const std::unordered_map<std::string, colorType>
+stringToCType {
+  {"white", white},
+  {"orange", orange},
+  {"cyan", cyan},
+  {"green", green},
+  {"red", red},
+  {"blue", blue},
+  {"magenta", magenta},
+  {"yellow", yellow},
+  {"silver", silver},
+  {"gold", gold}
+};
+enum bonusType {
+  none=0,
+  laser,
+  bigger,
+  capture,
+  slow,
+  interruption,
+  player
+};
+const std::unordered_map<std::string, bonusType>
+stringToBType {
+  {"none", none},
+  {"laser", laser},
+  {"bigger", bigger},
+  {"capture", capture},
+  {"slow", slow},
+  {"interruption", interruption},
+  {"player", player},
+};
+using namespace COLORS;
+const std::unordered_map<colorType, ALLEGRO_COLOR>
+typeToColor {
+  {white, WHITE},
+  {orange, ORANGE},
+  {cyan, CYAN},
+  {green, GREEN},
+  {red, RED},
+  {blue, BLUE},
+  {magenta, MAGENTA},
+  {yellow, YELLOW},
+  {silver, GREY},
+  {gold, YELLOW_B}
+};
+struct Param {
+  unsigned int row;
+  unsigned int col;
+  colorType color;
+  bonusType bonus;
+};
+}; // Brick
 
 #endif

@@ -2,45 +2,59 @@
 #define ENTITY_H
 
 #include <allegro5/color.h>
+#include <vector>
 
 #include "utils.hpp"
 
+// -------------------------------------------------------------------------
+// Entity
+// -------------------------------------------------------------------------
 class Entity {
- protected:
-  Entity() = default;
+protected:
+  Entity(tpl position);
   Entity(const Entity&) = default;
-
- public:
-  virtual ~Entity() = default;
-};
-
-class DynamiqueEntity : public Entity {
- protected:
-  DynamiqueEntity() = default;
-  DynamiqueEntity(const DynamiqueEntity&) = default;
-
- public:
-  virtual void move(int dx, int dy) = 0;
-  virtual ~DynamiqueEntity() = default;
-};
-
-class TestRectangle : virtual public DynamiqueEntity {
- private:
   tpl pos;
-  float w;
-  float h;
+public:
+  virtual ~Entity() = default;
+  float x() const;
+  float y() const;
+  void move(float dx, float dy);
+};
+
+// -------------------------------------------------------------------------
+// Brick
+// -------------------------------------------------------------------------
+
+class Brick : public Entity {
+private:
+  const float w = BRICK_CONST::width;
+  const float h = BRICK_CONST::height;
+  BRICK_CONST::colorType type;
+  BRICK_CONST::bonusType bonus;
   ALLEGRO_COLOR col;
+  int life;
+public:
+  Brick(tpl position,
+        BRICK_CONST::colorType brickType,
+        BRICK_CONST::bonusType bonus);
+  ~Brick();
+  float width() const;
+  float height() const;
+  BRICK_CONST::colorType getType() const;
+  ALLEGRO_COLOR color() const;
+};
 
- public:
-  float x();
-  float y();
-  float width();
-  float height();
-  ALLEGRO_COLOR color();
-
-  TestRectangle(tpl position, float width, float height, ALLEGRO_COLOR color);
-  ~TestRectangle();
-  void move(int dx, int dy);
+class BrickHolder {
+private:
+  std::vector<Brick*> brickContainer;
+  static constexpr int maxRow = 8;
+  static constexpr int maxCol = 14;
+public:
+  BrickHolder();
+  BrickHolder(std::vector<BRICK_CONST::Param> bricksData);
+  ~BrickHolder();
+  void addBrick(BRICK_CONST::Param brickData);
+  std::vector<Brick*> getContainer() const;
 };
 
 #endif
