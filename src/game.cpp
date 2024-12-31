@@ -33,10 +33,14 @@ void GameManager::run() {
     ALLEGRO_EVENT event;
     al_start_timer(gameEnv->TIMER);
     al_wait_for_event(gameEnv->QUEUE, &event);
+
+    // Gestion des entrées utilisateur
     input->handle(event, level, running);
+
+
     if (event.type == ALLEGRO_EVENT_TIMER) {
       al_clear_to_color(al_map_rgb(255, 255, 255));
-      render->drawTestRect(level->getTestRect());
+      render->drawTestRect(level->getPalette());
       al_flip_display();
     }
   }
