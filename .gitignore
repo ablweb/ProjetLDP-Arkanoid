@@ -2,3 +2,4 @@
 /build/
 *.o
 arkanoid
+compile_commands.json

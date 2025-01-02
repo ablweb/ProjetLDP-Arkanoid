@@ -10,6 +10,7 @@ OFILES  := o
 CC      := g++
 CFLAGS  := -isystem lib -Wall -Wextra -O2 -std=gnu++20 -Wpedantic -march=native -Wnull-dereference -Winline -Wconversion -g 
 CFLAGS 	+= $(shell pkg-config allegro-5 allegro_primitives-5 allegro_font-5 --cflags | sed 's/-I/-isystem/g')
+CFlAGS  += 
 
 LIBS    += -isystem lib -w
 LIBS 		+= $(shell pkg-config allegro-5 allegro_primitives-5 allegro_font-5 allegro_ttf-5 --libs) -lallegro_main

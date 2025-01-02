@@ -7,18 +7,19 @@
 
 int main() {
   using namespace RETURN_CODE;
-  std::unique_ptr<Env> gameEnv;
   // check if any errors occured during allegro environment initialization
   try {
-    gameEnv = std::make_unique<Env>();
+    env.init();
   } catch (const std::runtime_error& err) {
+    env.cleanup();
     std::cerr << "Allegro: " << err.what() << std::endl;
     return ENVIRONMENT_SETUP_FAIL;
   }
 
-  GameEngine* arkanoidGame = new GameEngine(std::move(gameEnv));
+  GameEngine* arkanoidGame = new GameEngine();
 
   delete arkanoidGame;
   arkanoidGame = nullptr;
+  env.cleanup();
   return SUCCES;
 }

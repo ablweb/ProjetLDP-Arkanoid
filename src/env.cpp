@@ -13,14 +13,20 @@
 
 #include "config.hpp"
 
-Env::Env() : FONT(nullptr), DISPLAY(nullptr), QUEUE(nullptr), TIMER(nullptr) {
+Env& env = Env::getInstance();
+
+void Env::init() {
+  FONT = nullptr;
+  DISPLAY = nullptr;
+  QUEUE = nullptr;
+  TIMER = nullptr;
   initAddons();
   createAssets();
   registerEvents();
   _isInit = true;
 }
 
-Env::~Env() {
+void Env::cleanup() {
   if (FONT) al_destroy_font(FONT);
   if (DISPLAY) al_destroy_display(DISPLAY);
   if (QUEUE) al_destroy_event_queue(QUEUE);

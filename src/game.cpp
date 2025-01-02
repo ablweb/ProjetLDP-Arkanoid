@@ -9,20 +9,13 @@
 #include <stdexcept>
 #include <utility>
 
-#include "controller.hpp"
 #include "env.hpp"
-#include "level.hpp"
-#include "renderer.hpp"
+#include "controller.hpp"
 #include "stateManager.hpp"
+#include "renderer.hpp"
+#include "level.hpp"
 
-GameEngine::GameEngine(EnvUPtr gameEnv) : env(std::move(gameEnv)) {
-  checkEnv();
-  generateController();
-  running = true;
-  run();
-}
-
-GameEngine::GameEngine(Env* gameEnv) : env(gameEnv) {
+GameEngine::GameEngine() {
   checkEnv();
   generateController();
   running = true;
@@ -32,7 +25,7 @@ GameEngine::GameEngine(Env* gameEnv) : env(gameEnv) {
 GameEngine::~GameEngine() {}
 
 void GameEngine::checkEnv() {
-  if (!env->isInitialized())
+  if (!env.isInitialized())
     throw std::runtime_error("Game environment not initialized");
 }
 
@@ -45,11 +38,11 @@ void GameEngine::generateController() {
 }
 
 void GameEngine::run() {
-  al_start_timer(env->TIMER);
-  controller->loadLevel();
+  al_start_timer(env.TIMER);
+  controller->loadLevel(1);
   while (running) {
     ALLEGRO_EVENT event;
-    al_wait_for_event(env->QUEUE, &event);
+    al_wait_for_event(env.QUEUE, &event);
     if (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
       running = false;
     }

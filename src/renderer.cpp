@@ -15,14 +15,14 @@ Renderer::~Renderer() {}
 
 void Renderer::refresh() {
   al_clear_to_color(COLORS::GREY);
-  drawnBackground();
+  drawBackground();
   // https://stackoverflow.com/questions/1198260/how-can-you-iterate-over-the-elements-of-an-stdtuple
   std::apply([this](const auto&... entity) { ((render(entity.get())), ...); },
              lvl->all());
   al_flip_display();
 }
 
-void Renderer::drawnBackground() {
+void Renderer::drawBackground() {
   al_draw_filled_rectangle(SIDE_MARGIN,TOP_MARGIN,
                            DISPLAY_WIDTH-SIDE_MARGIN,
                            DISPLAY_HEIGHT-TOP_MARGIN,

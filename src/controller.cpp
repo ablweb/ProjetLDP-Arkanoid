@@ -2,29 +2,21 @@
 
 #include <allegro5/keycodes.h>
 
-#include <filesystem>
+#include <cstddef>
+#include <exception>
 #include <iostream>
 #include <memory>
-#include <string>
 #include <sys/types.h>
-#include <unordered_set>
 #include <utility>
-#include <fstream>
-#include "json.hpp"
 
-#include "config.hpp"
+#include "level.hpp"
 #include "renderer.hpp"
 #include "stateManager.hpp"
-#include "level.hpp"
-#include "utils.hpp"
-
-using json = nlohmann::json;
 
 Controller::Controller(StateManagerUPtr stateManager, RendererUPtr renderer,
                        LevelSPtr level)
-    : sm(std::move(stateManager)), rndr(std::move(renderer)), lvl(level) {
-  registerLevelFiles();
-}
+    : sm(std::move(stateManager)), rndr(std::move(renderer)), lvl(level),
+      loader(std::make_unique<LevelLoader>()), currentLevel(-1) {}
 
 Controller::~Controller() {}
 
@@ -41,7 +33,15 @@ int Controller::handleInput(const ALLEGRO_EVENT& event) {
       break;
     case ALLEGRO_KEY_N:
       std::cerr << "|Controller::handleInput() -> KEY_N\n";
-      loadLevel();
+      loadLevel(1);
+      break;
+    case ALLEGRO_KEY_P:
+      std::cerr << "|Controller::handleInput() -> KEY_P\n";
+      loadLevel(0);
+      break;
+    case ALLEGRO_KEY_R:
+      std::cerr << "|Controller::handleInput() -> KEY_R\n";
+      reloadLevels();
       break;
     case ALLEGRO_KEY_X:
       std::cerr << "|Controller::handleInput() -> KEY_X\n";
@@ -55,100 +55,33 @@ int Controller::handleInput(const ALLEGRO_EVENT& event) {
 
 void Controller::refreshDisplay() { rndr->refresh(); }
 
-void Controller::loadLevel() {
-  static auto currentLevel = levelFiles.begin();
-  if (levelFiles.size() == 0) {
-    loadDefaultLevel();
+void Controller::loadLevel(bool next) {
+  if (loader->isEmpty()) {
+    std::cerr<<"|Controller::loadLevel() -> No levels registered. Loading default level.\n";
+    loader->loadDefault(lvl.get());
+    return;
+  }
+  size_t index;
+  if (next) {
+    index = ((size_t)currentLevel+1) % loader->levelCount();
   } else {
-    loadJsonLevel(currentLevel->first);
-    if (++currentLevel == levelFiles.end()) {
-      currentLevel = levelFiles.begin();
-    }
+    index = ((size_t)currentLevel-1+loader->levelCount()) % loader->levelCount();
   }
-}
-
-void Controller::loadDefaultLevel() { lvl->loadDefault(); }
-
-void Controller::loadJsonLevel(const std::string& levelPath) {
-  std::vector<BRICK_CONST::Param> bricksData;
   try {
-    json j = json::parse(levelFiles[levelPath]);
-
-    for (const auto& entry : j) {
-      BRICK_CONST::Param p;
-      p.row = entry["row"];
-      p.col = entry["col"];
-      p.color = BRICK_CONST::stringToCType.at(entry["color"]);
-      p.bonus = BRICK_CONST::stringToBType.at(entry["bonus"]);
-      bricksData.push_back(p);
-    }
-  } catch (const json::exception& err) {
-    std::cerr << "Error whlie loading json file: " << err.what() << "\n";
+    loader->load(index,lvl.get());
+    currentLevel = (int)index;
   } catch (const std::exception& err) {
-    std::cerr << "Error: " << err.what() << "\n";
-  }
-  lvl->loadCustom(bricksData, levelPath);
-}
-
-void Controller::registerLevelFiles() {
-  // https://en.cppreference.com/w/cpp/filesystem/directory_iterator
-  for (const auto& entry : std::filesystem::directory_iterator(LEVELS_DIR)) {
-    std::string entryPath = entry.path().string();
-    if (entry.is_regular_file() && isValidLevelFormat(entryPath)) {
-      // https://www.quora.com/What-is-the-best-method-to-read-a-file-at-once-and-store-it-as-a-std-string-in-C++
-      std::cerr << "|Controller::registerLevelFiles() -> " << entryPath << "\n";
-      std::ifstream file(entryPath);
-      std::stringstream fileContent; 
-      fileContent << file.rdbuf();
-      levelFiles[entryPath] = fileContent.str();
-    }
+    std::cerr<<"|Controller::loadLevel() -> Cannot load level of index {"<<index<<"}\n";
+    loader->loadDefault(lvl.get());
   }
 }
 
-bool Controller::isValidLevelFormat(const std::string& levelPath) {
-  // https://stackoverflow.com/questions/33628250/c-reading-a-json-object-from-file-with-nlohmann-json
-  const std::unordered_set<std::string> validColor = {
-    "white", "orange", "cyan", "green", "red", "blue", "magenta", "yellow",
-    "silver", "gold"};
-  const std::unordered_set<std::string> validBonus = {
-    "none", "laser", "bigger", "capture", "slow", "interruption", "player"};
+void Controller::reloadLevels() {
+  loader->reloadFiles();
   try {
-    int e = 0;
-    std::ifstream file(levelPath);
-    json j = json::parse(file);
-
-    for (const auto& entry : j) {
-      if (!entry.contains("row") || !entry.contains("col") || 
-        !entry.contains("color") || !entry.contains("bonus")) {
-        std::cerr<<"|Controller::isValidLevelFormat() -> In file {"<<levelPath<<"} In entry {"<<e<<"} missing information\n";
-        return false;
-      }
-      if (!entry["row"].is_number_integer() ||
-        entry["row"].get<int>() < 0 || entry["row"].get<int>() > 7) {
-        std::cerr << "|Controller::isValidLevelFormat() -> In file {"<<levelPath<<"} In entry {" << e << "} row not formated correctly\n";
-        return false;
-      }
-      if (!entry["col"].is_number_integer() ||
-        entry["col"].get<int>() < 0 || entry["col"].get<int>() > 13) {
-        std::cerr << "|Controller::isValidLevelFormat() -> In file {"<<levelPath<<"} In entry {" << e << "} col not formated correctly\n";
-        return false;
-      }
-      if (!entry["color"].is_string() || !validColor.count(entry["color"].get<std::string>())) {
-        std::cerr << "|Controller::isValidLevelFormat() -> In file {"<<levelPath<<"} In entry {" << e << "} color not formated correctly\n";
-        return false;
-      }
-      if (!entry["bonus"].is_string() || !validBonus.count(entry["bonus"].get<std::string>())) {
-        std::cerr << "|Controller::isValidLevelFormat() -> In file {"<<levelPath<<"} In entry {" << e << "} bonus not formated correctly\n";
-        return false;
-      }
-      e++;
-    }
-  } catch (json::exception& err) {
-    std::cerr << "Error whlie loading json file: " << err.what() << "\n";
-    return false;
+    loader->load((size_t)currentLevel,lvl.get());
   } catch (const std::exception& err) {
-    std::cerr << "Error: " << err.what() << "\n";
-    return false;
+    std::cerr<<"|Controller::loadLevel() -> Cannot load level of index {"<<currentLevel<<"}\n";
+    loader->loadDefault(lvl.get());
   }
-  return true;
 }

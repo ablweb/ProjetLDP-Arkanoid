@@ -19,7 +19,7 @@ class Renderer {
   ~Renderer();
   void refresh();
 
-  void drawnBackground();
+  void drawBackground();
   void renderType(Entity*);
   void render(BrickHolder*);
   void render(Brick*);

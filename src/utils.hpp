@@ -45,6 +45,22 @@ namespace RETURN_CODE {
 enum { SUCCES, ENVIRONMENT_SETUP_FAIL };
 };  // namespace RETURN_CODE
 
+namespace HELP {
+inline const std::string LEVEL_JSON_FORMAT = 
+  "HELP: LEVEL_JSON_FORMAT\n"
+  "The level JSON format should be an array of objects, each representing a tile in the level. Each tile must contain the following fields:\n"
+  "  - 'row' (integer): The row number of the tile (0 <= row <= 7).\n"
+  "  - 'col' (integer): The column number of the tile (0 <= col <= 13).\n"
+  "  - 'color' (string): The color of the tile. Allowed values: 'white', 'orange', 'cyan', 'green', 'red', 'blue', 'magenta', 'yellow', 'silver', 'gold'.\n"
+  "  - 'bonus' (string): The bonus on the tile. Allowed values: 'none', 'laser', 'bigger', 'capture', 'slow', 'interruption', 'player'.\n"
+  "Example:\n"
+  "[\n"
+  "  {\"row\": 0, \"col\": 0, \"color\": \"cyan\", \"bonus\": \"none\"},\n"
+  "  {\"row\": 1, \"col\": 1, \"color\": \"green\", \"bonus\": \"laser\"}\n"
+  "]\n"
+  "Make sure all values are within the allowed ranges and use valid strings for color and bonus.\n";
+}; // namespace HELP
+
 namespace COLORS {
 const ALLEGRO_COLOR BLACK    = al_map_rgb(0,0,0);
 const ALLEGRO_COLOR WHITE    = al_map_rgb(255,255,255);

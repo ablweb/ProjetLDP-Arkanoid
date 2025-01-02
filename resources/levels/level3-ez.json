@@ -1,0 +1,27 @@
+[
+  {"row": 3, "col": 3, "color": "green", "bonus": "none"},
+  {"row": 4, "col": 3, "color": "green", "bonus": "none"},
+  {"row": 5, "col": 3, "color": "green", "bonus": "none"},
+  {"row": 6, "col": 3, "color": "green", "bonus": "none"},
+  {"row": 7, "col": 3, "color": "green", "bonus": "none"},
+
+  {"row": 3, "col": 4, "color": "green", "bonus": "none"},
+  {"row": 5, "col": 4, "color": "green", "bonus": "none"},
+  {"row": 7, "col": 4, "color": "green", "bonus": "none"},
+
+  {"row": 3, "col": 5, "color": "green", "bonus": "none"},
+  {"row": 5, "col": 5, "color": "green", "bonus": "none"},
+  {"row": 7, "col": 5, "color": "green", "bonus": "none"},
+
+  {"row": 3, "col": 8, "color": "green", "bonus": "none"},
+  {"row": 6, "col": 8, "color": "green", "bonus": "none"},
+  {"row": 7, "col": 8, "color": "green", "bonus": "none"},
+
+  {"row": 3, "col": 9, "color": "green", "bonus": "none"},
+  {"row": 5, "col": 9, "color": "green", "bonus": "none"},
+  {"row": 7, "col": 9, "color": "green", "bonus": "none"},
+
+  {"row": 3, "col": 10, "color": "green", "bonus": "none"},
+  {"row": 4, "col": 10, "color": "green", "bonus": "none"},
+  {"row": 7, "col": 10, "color": "green", "bonus": "none"}
+]
