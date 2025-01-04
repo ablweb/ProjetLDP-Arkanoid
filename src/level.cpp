@@ -4,15 +4,42 @@
 #include <fcntl.h>
 #include <fstream>
 #include <filesystem>
+#include <memory>
 #include <set>
 #include <stdexcept>
 #include <string>
 #include <sys/types.h>
 
 #include "json.hpp"
+#include "utils.hpp"
 using json = nlohmann::json;
 
 #include "config.hpp"
+
+// -------------------------------------------------------------------------
+// Level
+// -------------------------------------------------------------------------
+std::vector<Entity*> Level::all() const {
+  std::vector<Entity*> allEntities; 
+  for (auto& brick : bricks->getContainer()) {
+    allEntities.push_back(brick);
+  }
+  allEntities.push_back(paddle.get());
+  allEntities.push_back(ball.get());
+  return allEntities;
+}
+
+std::vector<CollisionGroup> Level::getColisionMasks() const {
+  std::vector<CollisionGroup> collisionMasks;
+  CollisionGroup ballGroup;
+  ballGroup.group.push_back(ball.get());
+  ballGroup.masked.push_back(paddle.get());
+  for (auto& brick : bricks->getContainer()) {
+    ballGroup.masked.push_back(brick);
+  }
+  collisionMasks.push_back(ballGroup);
+  return collisionMasks;
+}
 
 // -------------------------------------------------------------------------
 // Level Loader
@@ -29,11 +56,23 @@ void LevelLoader::load(size_t levelIndex, Level* lvl) {
   if (levelIndex >= levelCount()) { throw std::runtime_error("No level to load");}
   std::cerr<<"|Level::load -> Loading custom level {"<<levelNames[levelIndex]<<"}\n";
   lvl->bricks = std::make_unique<BrickHolder>(levelDatas[levelIndex]);
+  lvl->paddle = std::make_unique<Paddle>(PADDLE_CONST::spawnPosition,
+                                         PADDLE_CONST::normalColor);
+  lvl->ball = std::make_unique<Ball>(BALL_CONST::spawnPosition,
+                                     BALL_CONST::baseSpeed,
+                                     BALL_CONST::baseRadius,
+                                     BALL_CONST::normalColor);
 }
 
 void LevelLoader::loadDefault(Level* lvl) {
   std::cerr<<"|Level::loadDefault -> Loading default level\n";
   lvl->bricks = std::make_unique<BrickHolder>();
+  lvl->paddle = std::make_unique<Paddle>(PADDLE_CONST::spawnPosition,
+                                         PADDLE_CONST::normalColor);
+  lvl->ball = std::make_unique<Ball>(BALL_CONST::spawnPosition,
+                                     BALL_CONST::baseSpeed,
+                                     BALL_CONST::baseRadius,
+                                     BALL_CONST::normalColor);
   // Generate default level (tringular shape)
   using namespace BRICK_CONST;
   for (uint col = 1;col <= 12;++col) {

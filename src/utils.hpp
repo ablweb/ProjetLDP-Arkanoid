@@ -1,11 +1,13 @@
 #ifndef UTILS_H
 #define UTILS_H
 
+#include "config.hpp"
 #include <allegro5/color.h>
 
 #include <iostream>
 #include <memory>
 #include <string>
+#include <unordered_map>
 #include <unordered_map>
 #include <vector>
 
@@ -67,6 +69,7 @@ const ALLEGRO_COLOR WHITE    = al_map_rgb(255,255,255);
 const ALLEGRO_COLOR ORANGE   = al_map_rgb(255,165,0);
 const ALLEGRO_COLOR CYAN     = al_map_rgb(0,255,255);
 const ALLEGRO_COLOR GREEN    = al_map_rgb(0,255,0);
+const ALLEGRO_COLOR GREEN_B  = al_map_rgb(0,255,100);
 const ALLEGRO_COLOR RED      = al_map_rgb(255,0,0);
 const ALLEGRO_COLOR BLUE     = al_map_rgb(0,0,255);
 const ALLEGRO_COLOR MAGENTA  = al_map_rgb(255,0,255);
@@ -87,8 +90,7 @@ enum colorType {
   green=80,
   red=90,
   blue=100,
-  magenta=110,
-  yellow=120,
+  magenta=110, yellow=120,
   silver=200,
   gold=-1
 };
@@ -135,7 +137,7 @@ typeToColor {
   {blue, BLUE},
   {magenta, MAGENTA},
   {yellow, YELLOW},
-  {silver, GREY},
+  {silver, GREY_B},
   {gold, YELLOW_B}
 };
 struct Param {
@@ -145,5 +147,26 @@ struct Param {
   bonusType bonus;
 };
 }; // Brick
+
+namespace PADDLE_CONST { 
+constexpr float spawnWidth = 100.0;
+constexpr float spawnHeight = 15.0; 
+constexpr tpl spawnPosition = {
+  ((float)DISPLAY_WIDTH/2),
+  ((float)DISPLAY_HEIGHT)-GAME_TOP_MARGIN/1.5
+};
+constexpr float normalSpeed = 8.0; 
+const ALLEGRO_COLOR normalColor = COLORS::WHITE;
+} // PADDLE_CONST
+
+namespace BALL_CONST { 
+constexpr float baseRadius = 10.0; 
+constexpr tpl spawnPosition = {
+  PADDLE_CONST::spawnPosition.x,
+  PADDLE_CONST::spawnPosition.y-baseRadius*2
+};
+constexpr float baseSpeed = 5.0; 
+const ALLEGRO_COLOR normalColor = COLORS::GREEN_B;
+} // PADDLE_CONST
 
 #endif

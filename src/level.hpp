@@ -4,18 +4,25 @@
 #include <memory>
 #include <string>
 #include <sys/types.h>
-#include <tuple>
 #include <unordered_set>
 #include <vector>
 
 #include "entity.hpp"
 #include "utils.hpp"
 
+struct CollisionGroup {
+  std::vector<Entity*> group;
+  std::vector<Entity*> masked;
+};
+
 struct Level {
   // Here add all Game Entities
   std::unique_ptr<BrickHolder> bricks;
-  // Also add them to the return tuple of all()
-  auto all() const { return std::tie(bricks); }
+  std::unique_ptr<Paddle> paddle;
+  std::unique_ptr<Ball> ball;
+  // Also add them to the return vector of all()
+  std::vector<Entity*> all() const;
+  std::vector<CollisionGroup> getColisionMasks() const;
 };
 
 class LevelLoader {

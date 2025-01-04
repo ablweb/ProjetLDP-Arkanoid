@@ -16,42 +16,75 @@
 Controller::Controller(StateManagerUPtr stateManager, RendererUPtr renderer,
                        LevelSPtr level)
     : sm(std::move(stateManager)), rndr(std::move(renderer)), lvl(level),
-      loader(std::make_unique<LevelLoader>()), currentLevel(-1) {}
+      loader(std::make_unique<LevelLoader>()),
+      keyState(false), currentLevel(-1) {}
 
 Controller::~Controller() {}
 
 int Controller::handleInput(const ALLEGRO_EVENT& event) {
   int ret = 0;
-  switch (event.keyboard.keycode) {
-    case ALLEGRO_KEY_LEFT:
-      std::cerr << "|Controller::handleInput() -> KEY_LEFT\n";
-      sm->movePaddleLeft();
-      break;
-    case ALLEGRO_KEY_RIGHT:
-      std::cerr << "|Controller::handleInput() -> KEY_RIGHT\n";
-      sm->movePaddleRight();
-      break;
-    case ALLEGRO_KEY_N:
-      std::cerr << "|Controller::handleInput() -> KEY_N\n";
-      loadLevel(1);
-      break;
-    case ALLEGRO_KEY_P:
-      std::cerr << "|Controller::handleInput() -> KEY_P\n";
-      loadLevel(0);
-      break;
-    case ALLEGRO_KEY_R:
-      std::cerr << "|Controller::handleInput() -> KEY_R\n";
-      reloadLevels();
-      break;
-    case ALLEGRO_KEY_X:
-      std::cerr << "|Controller::handleInput() -> KEY_X\n";
-      ret = -1; 
-      break;
-    default:
-      break;
+  if (event.type == ALLEGRO_EVENT_KEY_DOWN) {
+    switch (event.keyboard.keycode) {
+      case ALLEGRO_KEY_A:
+        std::cerr<<"|Controller::handleInput() -> KEY_A_DOWN:LEFT\n";
+        keyState[LEFT] = true; break;
+      case ALLEGRO_KEY_Q:
+        std::cerr<<"|Controller::handleInput() -> KEY_Q_DOWN:LEFT\n";
+        keyState[LEFT] = true; break;
+      case ALLEGRO_KEY_D:
+        std::cerr<<"|Controller::handleInput() -> KEY_D_DOWN:RIGHT\n";
+        keyState[RIGHT] = true; break;
+      case ALLEGRO_KEY_P:
+        std::cerr<<"|Controller::handleInput() -> KEY_P_DOWN:RIGHT\n";
+        keyState[RIGHT] = true; break;
+      case ALLEGRO_KEY_SPACE:
+        std::cerr<<"|Controller::handleInput() -> KEY_SPACE_DOWN:ACTION\n";
+        sm->launchBall(); break;
+      case ALLEGRO_KEY_RIGHT:
+        std::cerr<<"|Controller::handleInput() -> KEY_RIGHT_DOWN:NEXT\n";
+        loadLevel(1); break;
+      case ALLEGRO_KEY_LEFT:
+        std::cerr<<"|Controller::handleInput() -> KEY_LEFT_DOWN:PREVIOUS\n";
+        loadLevel(0); break;
+      case ALLEGRO_KEY_R:
+        std::cerr<<"|Controller::handleInput() -> KEY_R_DOWN:RELOAD\n";
+        reloadLevels(); break;
+      case ALLEGRO_KEY_ESCAPE:
+        std::cerr<<"|Controller::handleInput() -> KEY_ESCAPE_DOWN:QUIT\n";
+        ret = -1; break;
+      default: break;
+    }
   }
+  if (event.type == ALLEGRO_EVENT_KEY_UP) {
+    switch (event.keyboard.keycode) {
+      case ALLEGRO_KEY_A:
+        std::cerr<<"|Controller::handleInput() -> KEY_A_UP:LEFT\n";
+        keyState[LEFT] = false; break;
+      case ALLEGRO_KEY_Q:
+        std::cerr<<"|Controller::handleInput() -> KEY_Q_UP:LEFT\n";
+        keyState[LEFT] = false; break;
+      case ALLEGRO_KEY_D:
+        std::cerr<<"|Controller::handleInput() -> KEY_D_UP:RIGHT\n";
+        keyState[RIGHT] = false; break;
+      case ALLEGRO_KEY_P:
+        std::cerr<<"|Controller::handleInput() -> KEY_P_UP:RIGHT\n";
+        keyState[RIGHT] = false; break;
+      default: break;
+    }
+  }
+  handleContiniousKeyPress();
   return ret;
 }
+
+void Controller::handleContiniousKeyPress() {
+  if (keyState[LEFT]) {
+    sm->movePaddleLeft();
+  } else if (keyState[RIGHT]) {
+    sm->movePaddleRight();
+  }
+}
+
+void Controller::updateGameState() { sm->update(); }
 
 void Controller::refreshDisplay() { rndr->refresh(); }
 
