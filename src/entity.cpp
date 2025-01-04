@@ -45,19 +45,34 @@ bool CollisionRect::checkCollision(const CollisionRect* other) {
   return false;
 }
 bool CollisionRect::checkCollision(const CollisionCircle* other){
-  // Code generere par GPT-3.5 : 
-  // write a methode for a object CollisionRect that detects collision with
-  // another object CollisionCircle. Using distance based detection
-  float oX=other->colX(), oY=other->colY(), oRad=other->colRadius(),
-        halfWidth=colHeight()/2, halfHeight=colHeight()/2,
-        thisX=colX(), thisY=colY();
-  float closestX = std::max(oX-halfWidth,std::min(thisX, oX+halfWidth));
-  float closestY = std::max(oY-halfHeight,std::min(thisY, oY+halfHeight));
-  colPoint.x = closestX; colPoint.y = closestY;
+  // https://www.jeffreythompson.org/collision-detection/circle-rect.php
+  float oX=other->colX(), oY=other->colY(), oRad=other->colRadius();
+  float left = colX() - colWidth()/2;
+  float right = colX() + colWidth()/2;
+  float top = colY() - colHeight()/2;
+  float bottom = colY() + colHeight()/2;
+  
+  // temporary variables to set edges for testing
+  float testX = oX;
+  float testY = oY;
 
-  double distance = std::sqrt(std::pow((closestX-thisX),2)+std::pow((closestY-thisY),2));
+  // which edge is closest?
+  if (oX < left)        testX = left;     // test left edge
+  else if (oX > right)  testX = right;    // right edge
+  if (oY < top)         testY = top;      // top edge
+  else if (oY > bottom) testY = bottom;   // bottom edge
 
-  return distance<=oRad;
+  // get distance from closest edges
+  float distX = oX-testX;
+  float distY = oY-testY;
+  colPoint.x = distX; colPoint.y = distY;
+  float distance = std::sqrt( (distX*distX) + (distY*distY) );
+
+  // if the distance is less than the radius, collision!
+  if (distance <= oRad) {
+    return true;
+  }
+  return false;
 }
 
 // -------------------------------------------------------------------------
@@ -72,19 +87,34 @@ float CollisionCircle::colY() const { return _c_pos->y; }
 float CollisionCircle::colRadius() const { return *_c_rad; }
 
 bool CollisionCircle::checkCollision(const CollisionRect* other){
-  // Code generere par GPT-3.5 : 
-  // write a methode for a object CollisionCircle that detects collision with
-  // another object CollisionRect. Using distance based detection
-  float oX=other->colX(), oY=other->colY(),
-        halfWidth=other->colWidth()/2, halfHeight=other->colHeight()/2,
-        thisX=colX(), thisY=colY(), thisRad=colRadius();
-  float closestX = std::max(oX-halfWidth,std::min(thisX, oX+halfWidth));
-  float closestY = std::max(oY-halfHeight,std::min(thisY, oY+halfHeight));
-  colPoint.x = closestX;colPoint.y = closestY;
+  // https://www.jeffreythompson.org/collision-detection/circle-rect.php
+  float thisX=colX(), thisY=colY(), thisRad=colRadius();
+  float left = other->colX() - other->colWidth()/2;
+  float right = other->colX() + other->colWidth()/2;
+  float top = other->colY() - other->colHeight()/2;
+  float bottom = other->colY() + other->colHeight()/2;
+  
+  // temporary variables to set edges for testing
+  float testX = thisX;
+  float testY = thisY;
 
-  double distance = std::sqrt(std::pow((closestX-thisX),2)+std::pow((closestY-thisY),2));
+  // which edge is closest?
+  if (thisX < left)        testX = left;     // test left edge
+  else if (thisX > right)  testX = right;    // right edge
+  if (thisY < top)         testY = top;      // top edge
+  else if (thisY > bottom) testY = bottom;   // bottom edge
 
-  return distance<=thisRad;
+  // get distance from closest edges
+  float distX = thisX-testX;
+  float distY = thisY-testY;
+  colPoint.x = distX; colPoint.y = distY;
+  float distance = std::sqrt( (distX*distX) + (distY*distY) );
+
+  // if the distance is less than the radius, collision!
+  if (distance <= thisRad) {
+    return true;
+  }
+  return false;
 }
 
 // -------------------------------------------------------------------------
@@ -274,11 +304,7 @@ void Ball::handleCollision(Brick* brick, tpl p) {
   std::cerr<<p.x<<"|"<<p.y<<"\n";
   std::cerr<<x()<<"|"<<y()<<"\n";
   std::cerr<<brick->x()<<"|"<<brick->y()<<"\n";
-  float distX = p.x-brick->x();
-  float distY = p.y-brick->y();
-  std::cerr<<"|Dist:\n";
-  std::cerr<<distX<<"|"<<distY<<"\n";
-  if (std::abs(distX) > std::abs(distY)) {
+  if (std::abs(p.x) > std::abs(p.y)) {
     std::cerr<<"   Horizontal side\n";
     bounceHorizontal();
   } else {
