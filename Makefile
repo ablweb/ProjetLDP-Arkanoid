@@ -30,8 +30,11 @@ all: $(EXE)
 $(EXE): $(OBJECTS)
 	$(CC) $^ -o $@ $(LIBS)
 
-$(OBJDIR)%$(OFILES): $(SRCDIR)%$(SFILES)
+$(OBJDIR)%$(OFILES): $(SRCDIR)%$(SFILES) build
 	$(CC) $(CFLAGS) $< -c -o $@
+
+build:
+	mkdir build
 
 clean:
 	@rm -f $(OBJECTS) $(EXE)
