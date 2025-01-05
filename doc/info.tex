@@ -107,8 +107,23 @@ public:
     \end{minipage}
 \end{center}
 
+\section{Level json formatage}
+les fichier de jeu sont encodes dans des fichier json stocker dans le dossier ressource/levels. Les fichier doivent suivre un formatage strict sinon il ne seront pas enregistrer dans le jeu. Le tout doit etre encadrer de '[' et chaque element represent une brick, premiere valeur est le "row" representant l'index de la rangée de la brick cette valeur doit etre un int et etre dans le bon range de valeur la meme pour "col", "color" et "bonus" doivent etre des string et etre de bonne valeur. 
+\begin{center}
+    \begin{minipage}[c]{0.5\textwidth}
+        \begin{verbatim}
+[
+  {"row": 0, "col": 0, "color": "cyan", "bonus": "none"},
+]
+        \end{verbatim}
+    \end{minipage}
+\end{center}
+Les fichier sont enregistrer en ordre alphabetic donc si l'emplacement du niveau dans le vecteur de niveau est important verifier que le nom sont bien formater.
+de preferance "levelX-LevelName.json"
+
 \section{Composition}
 Composition is a design principle where objects are composed of other objects to achieve complex functionality. This follows the "has-a" relationship, where one class contains another. Composition provides more flexibility, as components can be easily swapped or modified at runtime without modifying the entire class structure.
+
 
 \begin{center}
     \begin{minipage}[c]{0.5\textwidth}

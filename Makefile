@@ -8,9 +8,11 @@ EXE     := $(BINDIR)$(NAME)
 SFILES  := cpp
 OFILES  := o
 CC      := g++
-CFLAGS  := -Wall -Wextra -O2 -std=gnu++20 -Wpedantic -march=native -Wnull-dereference -Winline -Wconversion -g 
+#CFlAGS  += -g
+CFLAGS  := -isystem lib -Wall -Wextra -O2 -std=gnu++20 -Wnull-dereference -Winline
 CFLAGS 	+= $(shell pkg-config allegro-5 allegro_primitives-5 allegro_font-5 --cflags | sed 's/-I/-isystem/g')
 
+LIBS    += -isystem lib -w
 LIBS 		+= $(shell pkg-config allegro-5 allegro_primitives-5 allegro_font-5 allegro_ttf-5 --libs) -lallegro_main
 
 #CFLAGS  += -fsanitize=address
@@ -28,11 +30,8 @@ all: $(EXE)
 $(EXE): $(OBJECTS)
 	$(CC) $^ -o $@ $(LIBS)
 
-$(OBJDIR)%$(OFILES): $(SRCDIR)%$(SFILES) build
+$(OBJDIR)%$(OFILES): $(SRCDIR)%$(SFILES)
 	$(CC) $(CFLAGS) $< -c -o $@
-
-build:
-	mkdir -p $@
 
 clean:
 	@rm -f $(OBJECTS) $(EXE)

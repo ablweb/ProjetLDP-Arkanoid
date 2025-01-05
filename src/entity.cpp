@@ -1,26 +1,365 @@
 #include "entity.hpp"
 
+#include <algorithm>
 #include <allegro5/allegro_primitives.h>
-#include <allegro5/drawing.h>
+#include <cmath>
+#include <cstdlib>
+
+#include "config.hpp"
+#include "utils.hpp"
 
 // -------------------------------------------------------------------------
-// TestRectangle
+// Entity
 // -------------------------------------------------------------------------
-TestRectangle::TestRectangle(tpl position, float width, float height,
-                             ALLEGRO_COLOR color)
-    : pos(position), w(width), h(height), col(color) {}
+Entity::Entity(tpl position) : _pos(position) {}
+float Entity::x() const { return _pos.x; }
+float Entity::y() const { return _pos.y; }
 
-TestRectangle::~TestRectangle() {}
+// -------------------------------------------------------------------------
+// DynamiqueEntity
+// -------------------------------------------------------------------------
+DynamiqueEntity::DynamiqueEntity(tpl position) : Entity(position) {}
+void DynamiqueEntity::move(float dx, float dy) {
+  _pos.x+=dx;_pos.y+=dy;
+}
 
-float TestRectangle::x() { return pos.x; };
-float TestRectangle::y() { return pos.y; };
+// -------------------------------------------------------------------------
+// CollisionRect
+// -------------------------------------------------------------------------
+CollisionRect::CollisionRect(tpl* position, float* width, float* height)
+  : _c_pos(position),_c_w(width),_c_h(height) {}
+CollisionRect::~CollisionRect() {}
 
-float TestRectangle::width() { return w; };
-float TestRectangle::height() { return h; };
+float CollisionRect::colX() const { return _c_pos->x; }
+float CollisionRect::colY() const { return _c_pos->y; }
+float CollisionRect::colWidth() const { return *_c_w; }
+float CollisionRect::colHeight() const { return *_c_h; }
 
-ALLEGRO_COLOR TestRectangle::color() { return col; };
+bool CollisionRect::checkCollision(const CollisionRect* other) {
+  if (colX()+colWidth()  < other->colX() ||
+      colX()             > other->colX()+other->colWidth() ||
+      colY()+colHeight() < other->colY() ||
+      colY()             > other->colY()+other->colHeight() ) {
+    return true;
+  }
+  return false;
+}
+bool CollisionRect::checkCollision(const CollisionCircle* other){
+  // https://www.jeffreythompson.org/collision-detection/circle-rect.php
+  float oX=other->colX(), oY=other->colY(), oRad=other->colRadius();
+  float left = colX() - colWidth()/2;
+  float right = colX() + colWidth()/2;
+  float top = colY() - colHeight()/2;
+  float bottom = colY() + colHeight()/2;
+  
+  // temporary variables to set edges for testing
+  float testX = oX;
+  float testY = oY;
 
-void TestRectangle::move(int dx, int dy) {
-  pos.x += dx;
-  pos.y += dy;
+  // which edge is closest?
+  if (oX < left)        testX = left;     // test left edge
+  else if (oX > right)  testX = right;    // right edge
+  if (oY < top)         testY = top;      // top edge
+  else if (oY > bottom) testY = bottom;   // bottom edge
+
+  // get distance from closest edges
+  float distX = oX-testX;
+  float distY = oY-testY;
+  colPoint.x = distX; colPoint.y = distY;
+  float distance = std::sqrt( (distX*distX) + (distY*distY) );
+
+  // if the distance is less than the radius, collision!
+  if (distance <= oRad) {
+    return true;
+  }
+  return false;
+}
+
+// -------------------------------------------------------------------------
+// CollisionCircle
+// -------------------------------------------------------------------------
+CollisionCircle::CollisionCircle(tpl* position, float* radius)
+  : _c_pos(position),_c_rad(radius) {}
+CollisionCircle::~CollisionCircle() {}
+
+float CollisionCircle::colX() const { return _c_pos->x; }
+float CollisionCircle::colY() const { return _c_pos->y; }
+float CollisionCircle::colRadius() const { return *_c_rad; }
+
+bool CollisionCircle::checkCollision(const CollisionRect* other){
+  // https://www.jeffreythompson.org/collision-detection/circle-rect.php
+  float thisX=colX(), thisY=colY(), thisRad=colRadius();
+  float left = other->colX() - other->colWidth()/2;
+  float right = other->colX() + other->colWidth()/2;
+  float top = other->colY() - other->colHeight()/2;
+  float bottom = other->colY() + other->colHeight()/2;
+  
+  // temporary variables to set edges for testing
+  float testX = thisX;
+  float testY = thisY;
+
+  // which edge is closest?
+  if (thisX < left)        testX = left;     // test left edge
+  else if (thisX > right)  testX = right;    // right edge
+  if (thisY < top)         testY = top;      // top edge
+  else if (thisY > bottom) testY = bottom;   // bottom edge
+
+  // get distance from closest edges
+  float distX = thisX-testX;
+  float distY = thisY-testY;
+  colPoint.x = distX; colPoint.y = distY;
+  float distance = std::sqrt( (distX*distX) + (distY*distY) );
+
+  // if the distance is less than the radius, collision!
+  if (distance <= thisRad) {
+    return true;
+  }
+  return false;
+}
+
+void CollisionCircle::fixOverlap(DynamiqueEntity* thisEntity) {
+  if (std::abs(colPoint.x) >= std::abs(colPoint.y)) {
+    if (colPoint.x>=0) {
+      float overlap = 6;
+      thisEntity->move(overlap, 0);
+    } else {
+      float overlap = 6;
+      thisEntity->move(-overlap, 0);
+    }
+  } else {
+    if (colPoint.y>=0) {
+      float overlap = 6;
+      thisEntity->move(0, overlap);
+    } else {
+      float overlap = 6;
+      thisEntity->move(0, -overlap);
+    }
+  }
+}
+
+// -------------------------------------------------------------------------
+// Brick
+// -------------------------------------------------------------------------
+Brick::Brick(tpl position,
+             BRICK_CONST::colorType brickType,
+             BRICK_CONST::bonusType bonusType,
+             BrickHolder* holder,
+             int& score)
+  : Entity(position),
+    CollisionRect(&this->_pos,&_w,&_h),
+    _type(brickType),_bonus(bonusType),_scoreRef(score),_holder(holder) {
+  _col = BRICK_CONST::typeToColor.at(_type);
+  switch (brickType) {
+    case BRICK_CONST::silver:
+      _lives = 2;
+      break;
+    case BRICK_CONST::gold:
+      _lives = -1;
+      break;
+    default: _lives = 1;
+      break;
+  }
+}
+Brick::~Brick() {
+}
+
+void Brick::destroy() {
+  if (_lives!=-1) {
+    _scoreRef+=(int)_type; // Update the score if brick is not undestructable
+  }
+  if (_holder != nullptr) {
+    _holder->removeBrick(this);
+  } else {
+    delete this;
+  }
+}
+
+float Brick::width() const { return _w; }
+float Brick::height() const { return _h; }
+BRICK_CONST::colorType Brick::getType() const { return _type; }
+ALLEGRO_COLOR Brick::color() const { return _col; }
+bool Brick::isDestructable() const { return _lives!=-1; }
+
+void Brick::collisionDetected(Entity*,tpl) {
+  if (_lives!=-1) {
+    _lives -= 1;
+  }
+  if (_lives==0) {
+    destroy();
+  }
+}
+// -------------------------------------------------------------------------
+// BrickHolder
+// -------------------------------------------------------------------------
+BrickHolder::BrickHolder(int& score, std::vector<BRICK_CONST::Param> bricksData) 
+  :_score(score) {
+  for (const auto& b:bricksData) {
+    addBrick(b);
+  }
+}
+BrickHolder::BrickHolder(int& score) :_score(score) {}
+BrickHolder::~BrickHolder() {
+  for (auto brick : brickContainer) {
+    delete brick;
+  }
+  brickContainer.clear(); 
+}
+
+void BrickHolder::addBrick(BRICK_CONST::Param b) {
+  if (b.row >= maxRow || b.col >= maxCol) {
+    throw std::out_of_range("Brick position out of grid bounds");
+  }
+  using namespace BRICK_CONST;
+  brickContainer.push_back(new Brick(
+    tpl{((float)b.col+1) * (width + spacing) + GAME_SIDE_MARGIN,
+        ((float)b.row+1) * (height + spacing) + GAME_TOP_MARGIN},
+    b.color,
+    b.bonus,
+    this,
+    _score));
+}
+std::vector<Brick*> BrickHolder::getContainer() const {
+  return brickContainer;
+}
+void BrickHolder::removeBrick(Brick* brick) {
+  brickContainer.erase(
+    std::remove(brickContainer.begin(), brickContainer.end(), brick),
+    brickContainer.end()
+  );
+  delete brick;
+}
+
+// -------------------------------------------------------------------------
+// Paddle
+// -------------------------------------------------------------------------
+Paddle::Paddle(tpl position, ALLEGRO_COLOR color)
+  : DynamiqueEntity(position),
+    CollisionRect(&this->_pos,&_w,&_h),
+    _w(PADDLE_CONST::spawnWidth),
+    _h(PADDLE_CONST::spawnHeight),
+    _spd(PADDLE_CONST::normalSpeed),
+    _col(color) {}
+Paddle::~Paddle() {}
+
+void Paddle::move(float dx, [[maybe_unused]]float dy ) {
+  if ((SIDE_MARGIN+_w/2)<(_pos.x+dx)&&(_pos.x+dx)<(DISPLAY_WIDTH-SIDE_MARGIN-_w/2)) {
+    _pos.x+=dx;
+  }
+}
+
+float Paddle::width() const { return _w; }
+float Paddle::height() const { return _h; }
+ALLEGRO_COLOR Paddle::color() const { return _col; }
+
+void Paddle::move(bool direction) { move(direction?_spd:-_spd, 0); }
+void Paddle::collisionDetected(Entity*,tpl) {}
+
+// -------------------------------------------------------------------------
+// Ball
+// -------------------------------------------------------------------------
+Ball::Ball(tpl position, float speed, float radius, ALLEGRO_COLOR color, int& lives)
+  : DynamiqueEntity(position),
+    CollisionCircle(&this->_pos,&_rad),
+    _dx(0),_dy(0),_spd(speed),_rad(radius),_col(color),_bounceCount(0),_livesRef(lives),isAttached(true) {} 
+Ball::~Ball() {}
+
+void Ball::move(float dx, float dy ) {
+  _pos.x+=dx;_pos.y+=dy;
+  // check if collision with left or right walls
+  if ((_pos.x-_rad)<(SIDE_MARGIN)) {
+    // Move the ball inside the game area
+    float overlap = (float)SIDE_MARGIN-(_pos.x-_rad);
+    move(overlap, 0);
+    bounceHorizontal();
+  } else if ((_pos.x+_rad)>(DISPLAY_WIDTH-SIDE_MARGIN)) {
+    // Move the ball inside the game area
+    float overlap = (_pos.x+_rad)-(float)(DISPLAY_WIDTH-SIDE_MARGIN);
+    move(-overlap, 0);
+    bounceHorizontal();
+  }
+  // check if collision with top or bottom walls
+  if ((_pos.y-_rad)<(TOP_MARGIN) ) {
+    // Move the ball inside the game area
+    float overlap = (float)TOP_MARGIN-(_pos.y-_rad);
+    move(0, overlap);
+    bounceVertical();
+  } else if ((_pos.y+_rad)>(DISPLAY_HEIGHT-TOP_MARGIN-20.0f)) {
+    // reset the ball
+    resetBall();
+  }
+}
+void Ball::resetBall() {
+  _livesRef--;
+  _dx=0;_dy=0,_spd=BALL_CONST::baseSpeed;_bounceCount=0;isAttached=true;
+  _pos=BALL_CONST::spawnPosition;
+}
+void Ball::bounceHorizontal() { _dx = -_dx; _bounceCount++; updateSpeed(); }
+void Ball::bounceVertical() { _dy = -_dy; _bounceCount++;updateSpeed(); }
+void Ball::updateSpeed() {
+  if(LOG_LEVEL>=2)std::cerr<<"|Ball::speed -> "<<_spd<<"\n";
+  if (_spd>=BALL_CONST::maxSpeed) return;
+  if (_bounceCount!=0&&_bounceCount%BALL_CONST::bounceModulo==0) {
+      _spd++;
+    if(LOG)std::cerr<<"|Ball::updateSpeed() -> "<<_spd<<"\n";
+  }
+}
+
+void Ball::setDirection(float dx, float dy) {
+  _dx = dx;
+  _dy = dy;
+
+  // Normalise la direction pour conserver une vitesse constante
+  float length = std::sqrt(_dx * _dx + _dy * _dy);
+  if (length != 0) {
+    _dx /= length;
+    _dy /= length;
+  }
+}
+
+float Ball::radius() const { return _rad; }
+ALLEGRO_COLOR Ball::color() const { return _col; }
+
+void Ball::go() { _dx = 0.1f; _dy = -1; isAttached=false; }
+void Ball::setPos(float x) { _pos.x = x; }
+void Ball::move() { move(_dx * _spd,_dy * _spd); }
+
+void Ball::collisionDetected(Entity* other, tpl p) {
+  if (const auto paddle = dynamic_cast<Paddle*>(other)) {
+    if (LOG_LEVEL>=2)std::cerr<<"|Ball::collisionDetected() -> Ball against Paddle\n";
+    handleCollision(paddle, p);
+  } else if (const auto brick = dynamic_cast<Brick*>(other)) {
+    if (LOG_LEVEL>=2)std::cerr<<"|Ball::collisionDetected() -> Ball against Brick\n";
+    handleCollision(brick, p);
+  }
+};
+void Ball::handleCollision(Paddle* paddle,[[maybe_unused]] tpl p) {
+  if (LOG_LEVEL>=2)std::cerr<<" |Collision Details: \n"
+    <<"  |Relative Collision Point : {"<<p.x<<","<<p.y<<"}\n"
+    <<"  |Subjects Positions : Ball{"<<_pos.x<<","<<_pos.y<<"} ; Paddle{"
+    <<paddle->x()<<","<<paddle->y()<<"}\n";
+  // Calcul de la position relative de l'impact
+  float impactX = _pos.x - (paddle->x()-paddle->width()/2);
+  // Calcul de l'angle alpha (en degrés) en fonction de l'impact
+  float alpha = 30 + 120 * (1 - impactX / paddle->width());
+  // Conversion de l'angle en radians
+  float alphaRadians = alpha * M_PIf / 180.0f;
+
+  // Calcul du vecteur direction
+  float dx = std::cos(alphaRadians);
+  float dy = -std::sin(alphaRadians);
+  float length = std::sqrt(dx * dx + dy * dy);
+  setDirection(dx / length, dy / length);
+}
+void Ball::handleCollision([[maybe_unused]]Brick* brick, tpl p) {
+  if (LOG_LEVEL>=2)std::cerr<<" |Collision Details: \n"
+    <<"  |Relative Collision Point : {"<<p.x<<","<<p.y<<"}\n"
+    <<"  |Subjects Positions : Ball{"<<_pos.x<<","<<_pos.y<<"} ; Brick{"
+    <<brick->x()<<","<<brick->y()<<"}\n";
+  if (std::abs(p.x) > std::abs(p.y)) {
+    bounceHorizontal();
+    fixOverlap(this);
+  } else {
+    bounceVertical();
+    fixOverlap(this);
+  }
 }
