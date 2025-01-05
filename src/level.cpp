@@ -1,4 +1,5 @@
 #include "level.hpp"
+#include "env.hpp"  // Ajouté pour connaître le type Env ( debugging)
 
 #include <memory>
 #include "entity.hpp"
@@ -65,6 +66,7 @@ void LevelManager::update() {
     ball->bounceVertical();
   }
 
+<<<<<<< Updated upstream
   // Si la balle tombe en bas de l'écran
   if (ball->y() > 500) {
     loseLife();
@@ -74,6 +76,47 @@ void LevelManager::update() {
       ball->setDirection(0, -1);
     } else {
       // Si plus de vies, arrêter le jeu  (encore a faire )
+=======
+// -------------------------------------------------------------------------
+// Level Loader
+// -------------------------------------------------------------------------
+LevelLoader::LevelLoader(Env* environment) : env(environment) {
+  registerLevelFiles();
+}
+LevelLoader::~LevelLoader() {}
+
+size_t LevelLoader::levelCount() { return levelDatas.size(); }
+bool LevelLoader::isEmpty() { return levelDatas.empty(); }
+
+void LevelLoader::load(size_t levelIndex, Level* lvl) {
+  if (levelIndex >= levelCount()){
+    throw std::runtime_error("No level to load");
+  }
+  std::cerr<<"|Level::load -> Loading custom level {"<<levelNames[levelIndex]<<"}\n";
+  lvl->bricks = std::make_unique<BrickHolder>(levelDatas[levelIndex]);
+  lvl->paddle = std::make_unique<Paddle>(PADDLE_CONST::spawnPosition,PADDLE_CONST::normalColor);
+  lvl->ball = std::make_unique<Ball>(BALL_CONST::spawnPosition,BALL_CONST::baseSpeed, BALL_CONST::baseRadius, BALL_CONST::normalColor);
+  lvl->env = env; 
+
+}
+
+void LevelLoader::loadDefault(Level* lvl) {
+  std::cerr<<"|Level::loadDefault -> Loading default level\n";
+  lvl->bricks = std::make_unique<BrickHolder>();
+  lvl->paddle = std::make_unique<Paddle>(PADDLE_CONST::spawnPosition,PADDLE_CONST::normalColor);
+  lvl->ball = std::make_unique<Ball>(BALL_CONST::spawnPosition, BALL_CONST::baseSpeed, BALL_CONST::baseRadius, BALL_CONST::normalColor);
+  lvl->env = env; 
+                              
+  // Generate default level (tringular shape)
+  using namespace BRICK_CONST;
+  for (uint col = 1;col <= 12;++col) {
+    int colorIndex = 50;
+    uint start = 7;
+    uint end = start - (col <= (12+1)/2 ? col - 1 : 12 - col);
+    for (uint row = start;row >= end;--row) {
+      lvl->bricks->addBrick({row, col, (colorType)colorIndex, none});
+      colorIndex += 10;
+>>>>>>> Stashed changes
     }
   }
    // for score --------

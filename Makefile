@@ -16,6 +16,9 @@ LIBS 		+= $(shell pkg-config allegro-5 allegro_primitives-5 allegro_font-5 alleg
 #CFLAGS  += -fsanitize=address
 #LIBS    += -fsanitize=address
 
+LIBS += -lallegro_main
+
+
 SOURCES := $(shell find $(SRCDIR) -name "*.$(SFILES)")
 OBJECTS := $(patsubst $(SRCDIR)%.$(SFILES), $(OBJDIR)%.$(OFILES), $(SOURCES))
 

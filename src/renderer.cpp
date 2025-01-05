@@ -85,3 +85,19 @@ void Renderer::drawLives(int lives) {
 
   al_destroy_font(font);
 }
+
+
+void Renderer::drawVictoryMessage(int score) {
+  al_clear_to_color(COLORS::BLACK);
+
+  ALLEGRO_FONT* font = al_create_builtin_font(); // Utilise une police intégrée
+  if (!font) {
+    throw std::runtime_error("Failed to load font for victory message");
+  }
+
+  // Affiche le message de victoire
+  al_draw_textf(font,COLORS::GREEN,250, 200,ALLEGRO_ALIGN_CENTER, "Victory! Your Final Score: %d", score);
+  al_draw_text(font,COLORS::WHITE,250, 300, ALLEGRO_ALIGN_CENTER,"Press any key to restart");
+  al_flip_display(); // Met à jour l'écran
+  al_destroy_font(font);
+}
