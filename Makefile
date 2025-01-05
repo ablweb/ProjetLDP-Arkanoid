@@ -9,7 +9,7 @@ SFILES  := cpp
 OFILES  := o
 CC      := g++
 #CFlAGS  += -g
-CFLAGS  := -isystem lib -Wall -Wextra -O2 -std=gnu++20 -Wpedantic -march=native -Wnull-dereference -Winline -Wconversion -g
+CFLAGS  := -isystem lib -Wall -Wextra -O2 -std=gnu++20 -Wnull-dereference -Winline
 CFLAGS 	+= $(shell pkg-config allegro-5 allegro_primitives-5 allegro_font-5 --cflags | sed 's/-I/-isystem/g')
 
 LIBS    += -isystem lib -w

@@ -2,7 +2,6 @@
 Famous Arkanoid game written in c++ using the Allegro library
 
 # Installation
-------------
 
 To build and start game:
 
@@ -11,12 +10,10 @@ To build and start game:
 
 
 # Option
-------------
 - -l --log | Enable Logging
 - -m --mouse | Enable Mouse
 
 # How to play
-------------
 
 Break all bricks to win, don't let the ball fall, you have 3 lives, each time the ball falls you lose a life.
 Silver bricks need to be hit 2 times to break.
@@ -29,7 +26,6 @@ Gold bricks are unbreakable.
     ESCAPE     -     Quit the game  |
 
 # Custom Level Formating
-----------------------
 
 The level JSON format should be an array of objects, each representing a brick in the level. Each tile must contain the following fields
    - 'row' (integer): The row number of the tile (0 <= row <= 7).
