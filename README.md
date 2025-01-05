@@ -27,6 +27,9 @@ Gold bricks are unbreakable.
 
 # Custom Level Formating
 
+The custom levels are stored in resources/levels/
+In resources you can find a "levelTemplate.json", this can help create custom levels.
+
 The level JSON format should be an array of objects, each representing a brick in the level. Each tile must contain the following fields
    - 'row' (integer): The row number of the tile (0 <= row <= 7).
    - 'col' (integer): The column number of the tile (0 <= col <= 13).
@@ -40,3 +43,14 @@ Example:
     ]
 
 Make sure all values are within the allowed ranges and use valid strings for color and bonus.
+
+# Dependencies
+
+This project requires the following dependencies:
+
+ - Allegro 5: A cross-platform game programming library.
+
+# Libraries
+
+This project usses the JSON For Modern C++ library 
+[JSON](https://github.com/nlohmann/json)
