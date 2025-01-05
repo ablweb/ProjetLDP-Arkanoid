@@ -76,6 +76,7 @@ public:
   tpl colPoint = {0,0};
   bool checkCollision(const CollisionRect* other);
   virtual void collisionDetected(Entity*,tpl) = 0;
+  void fixOverlap(DynamiqueEntity* thisEntity);
 };
 
 // -------------------------------------------------------------------------
@@ -89,7 +90,8 @@ private:
   BRICK_CONST::colorType _type;
   BRICK_CONST::bonusType _bonus;
   ALLEGRO_COLOR _col;
-  int _life;
+  int _lives;
+  int& _scoreRef;
 
   BrickHolder* _holder;
   void destroy();
@@ -97,13 +99,15 @@ public:
   Brick(tpl position,
         BRICK_CONST::colorType brickType,
         BRICK_CONST::bonusType bonus,
-        BrickHolder* holder);
+        BrickHolder* holder,
+        int& score);
   ~Brick();
 
   float width() const;
   float height() const;
   BRICK_CONST::colorType getType() const;
   ALLEGRO_COLOR color() const;
+  bool isDestructable() const;
 
   void collisionDetected(Entity*,tpl) override;
 };
@@ -116,9 +120,11 @@ private:
   std::vector<Brick*> brickContainer;
   static constexpr int maxRow = 8;
   static constexpr int maxCol = 14;
+
+  int& _score;
 public:
-  BrickHolder();
-  BrickHolder(std::vector<BRICK_CONST::Param> bricksData);
+  BrickHolder(int& score);
+  BrickHolder(int& score, std::vector<BRICK_CONST::Param> bricksData);
   ~BrickHolder();
 
   std::vector<Brick*> getContainer() const;
@@ -154,14 +160,16 @@ class Ball : public DynamiqueEntity, public CollisionCircle {
  private:
   float _dx,_dy,_spd,_rad;
   ALLEGRO_COLOR _col;
+  uint _bounceCount;
+  int& _livesRef;
   void move(float dx, float dy) override;
+  void resetBall();
   void bounceHorizontal();
   void bounceVertical();
+  void updateSpeed();
   void setDirection(float dx, float dy);
-  void handleCollision(Brick* brick, tpl collisionPoint);
-  void handleCollision(Paddle* paddle, tpl collisionPoint);
  public:
-  Ball(tpl position, float speed, float radius, ALLEGRO_COLOR color);
+  Ball(tpl position, float speed, float radius, ALLEGRO_COLOR color, int& lives);
   ~Ball();
 
   bool isAttached;
@@ -171,7 +179,11 @@ class Ball : public DynamiqueEntity, public CollisionCircle {
   void go();
   void setPos(float x);
   void move();
+
   void collisionDetected(Entity*,tpl) override;
+ private:
+  void handleCollision(Brick* brick, tpl collisionPoint);
+  void handleCollision(Paddle* paddle, tpl collisionPoint);
 };
 
 #endif

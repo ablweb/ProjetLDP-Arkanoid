@@ -3,11 +3,7 @@
 
 #include <memory>
 
-class Entity;
-struct Level;
-struct CollisionGroup;
-class CollisionRect;
-class CollisionCircle;
+class Level;
 
 typedef std::shared_ptr<Level> LevelSPtr;
 
@@ -37,6 +33,8 @@ class StateManager {
   void movePaddleLeft();
   void launchBall();
   void update();
+  bool isVictory() const;
+  bool isLose() const;
 
  private:
   /*

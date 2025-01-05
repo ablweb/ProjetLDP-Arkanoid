@@ -38,20 +38,21 @@ void GameEngine::generateController() {
 }
 
 void GameEngine::run() {
-  ALLEGRO_EVENT event;
   al_start_timer(env.TIMER);
-  controller->loadLevel(1);
+  controller->loadLevel(1, true);
   while (running) {
-    al_wait_for_event(env.QUEUE, &event);
-    if (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
+    al_wait_for_event(env.QUEUE, &env.EVENT);
+    al_get_mouse_state(&env.MOUSE_STATE);
+    if (env.EVENT.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
       running = false;
     }
-    if (controller->handleInput(event) == -1) {
+    if (controller->handleInput() == -1) {
       running = false;
     }
-    if (event.type == ALLEGRO_EVENT_TIMER) {
+    if (env.EVENT.type == ALLEGRO_EVENT_TIMER) {
       controller->updateGameState();
       controller->refreshDisplay();
+      controller->checkGameState(); // check Victory or Lose
     }
   }
 }

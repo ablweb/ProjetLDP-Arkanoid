@@ -44,7 +44,7 @@ struct tpl {
 };
 
 namespace RETURN_CODE {
-enum { SUCCES, ENVIRONMENT_SETUP_FAIL };
+enum { SUCCES, ENVIRONMENT_SETUP_FAIL, GAME_RUNTIME_ERROR };
 };  // namespace RETURN_CODE
 
 namespace HELP {
@@ -61,6 +61,12 @@ inline const std::string LEVEL_JSON_FORMAT =
   "  {\"row\": 1, \"col\": 1, \"color\": \"green\", \"bonus\": \"laser\"}\n"
   "]\n"
   "Make sure all values are within the allowed ranges and use valid strings for color and bonus.\n";
+inline const std::string DISPLAY_KEY_INFO = 
+  "Controls:\n"
+  "D / P      - Move paddle right  |  R           - Reload level files\n"
+  "A / Q      -  Move paddle left  |  RIGHT ARROW -     Previous level\n"
+  "SPACE      -   Launch the ball  |  LEFT ARROW  -         Next level\n"
+  "ESCAPE     -     Quit the game  |\n";
 }; // namespace HELP
 
 namespace COLORS {
@@ -77,7 +83,12 @@ const ALLEGRO_COLOR YELLOW   = al_map_rgb(255,255,0);
 const ALLEGRO_COLOR YELLOW_B = al_map_rgb(239,191,4);
 const ALLEGRO_COLOR GREY     = al_map_rgb(212,212,212);
 const ALLEGRO_COLOR GREY_B   = al_map_rgb(178,178,178);
+const ALLEGRO_COLOR FONT_C   = BLACK;
 };  // namespace COLORS
+
+namespace Game {
+enum State{IN_GAME,VICTORY,LOSE};
+}
 
 namespace BRICK_CONST {
 constexpr float width = 40.0;
@@ -155,7 +166,7 @@ constexpr tpl spawnPosition = {
   ((float)DISPLAY_WIDTH/2),
   ((float)DISPLAY_HEIGHT)-GAME_TOP_MARGIN/1.5
 };
-constexpr float normalSpeed = 8.0; 
+constexpr float normalSpeed = 6.0; 
 const ALLEGRO_COLOR normalColor = COLORS::WHITE;
 } // PADDLE_CONST
 
@@ -165,7 +176,10 @@ constexpr tpl spawnPosition = {
   PADDLE_CONST::spawnPosition.x,
   PADDLE_CONST::spawnPosition.y-baseRadius*2
 };
-constexpr float baseSpeed = 5.0; 
+constexpr float baseSpeed = 6.0; 
+constexpr float maxSpeed = 12.0; 
+constexpr int bounceModulo = 15; // Bounce before speed increases
+constexpr float deadzone = 20.0; // deadzone from bottom of game view
 const ALLEGRO_COLOR normalColor = COLORS::GREEN_B;
 } // PADDLE_CONST
 

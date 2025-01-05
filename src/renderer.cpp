@@ -1,9 +1,11 @@
 #include "renderer.hpp"
 
+#include <allegro5/allegro_font.h>
 #include <allegro5/allegro_primitives.h>
 
 #include "config.hpp"
 #include "entity.hpp"
+#include "env.hpp"
 #include "level.hpp"
 #include "utils.hpp"
 
@@ -11,15 +13,51 @@ Renderer::Renderer(ConstLevelSPtr level) : lvl(level) {}
 
 Renderer::~Renderer() {}
 
+void Renderer::saveScore(int c) { _savedScore = c; }
+
 void Renderer::refresh() {
   al_clear_to_color(COLORS::GREY);
   drawBackground();
-  for (Entity* entity : lvl->all()) {
-    render(entity);
+  if (GAME_STATE==IN_GAME) {
+    drawGameInfo();
+    for (Entity* entity : lvl->all()) {
+      render(entity);
+    }
+  }
+  else if (GAME_STATE==VICTORY) {
+    drawVictoryMessage();
+  }
+  else if (GAME_STATE==LOSE) {
+    drawLoseMessage();
   }
   al_flip_display();
 }
 
+void Renderer::drawVictoryMessage() {
+  drawGameInfo();
+  al_draw_textf(env.FONT_HUGE,COLORS::GREEN,
+                (float)DISPLAY_WIDTH/2,
+                (float)DISPLAY_HEIGHT/2,
+                ALLEGRO_ALIGN_CENTER,
+                "Victory!");
+  al_draw_text(env.FONT_HUGE,COLORS::WHITE,
+                (float)DISPLAY_WIDTH/2,
+                (float)DISPLAY_HEIGHT/2+FONT_SIZE*2,
+                ALLEGRO_ALIGN_CENTER,
+               "Press any key to continue");
+}
+void Renderer::drawLoseMessage() {
+  al_draw_textf(env.FONT_HUGE,COLORS::GREEN,
+                (float)DISPLAY_WIDTH/2,
+                (float)DISPLAY_HEIGHT/2,
+                ALLEGRO_ALIGN_CENTER,
+                "GAME OVER... Your Final Score: %d", _savedScore);
+  al_draw_text(env.FONT_HUGE,COLORS::WHITE,
+               (float)DISPLAY_WIDTH/2,
+               (float)DISPLAY_HEIGHT/2+FONT_SIZE*2,
+               ALLEGRO_ALIGN_CENTER,
+               "Press any key to restart");
+}
 void Renderer::drawBackground() {
   al_draw_filled_rectangle(SIDE_MARGIN,TOP_MARGIN,
                            DISPLAY_WIDTH-SIDE_MARGIN,
@@ -28,7 +66,49 @@ void Renderer::drawBackground() {
   al_draw_rectangle(12,12,DISPLAY_WIDTH-12,DISPLAY_HEIGHT-12,
                     COLORS::GREY_B,24);
 }
+void Renderer::drawGameInfo() {
+  drawScore();
+  drawLevelName();
+  drawRemainingLives();
+  drawKeyInfo();
+} 
+void Renderer::drawScore() {
+  float offset = 10;
+  al_draw_textf(env.FONT_HUGE, COLORS::YELLOW,
+                SIDE_MARGIN+offset, TOP_MARGIN,
+                0,"%i", lvl->getScore());
+}
+void Renderer::drawLevelName() {
+  al_draw_text(env.FONT_HUGE, COLORS::FONT_C,
+               (float)DISPLAY_WIDTH/2, (TOP_MARGIN/2)-((float)FONT_SIZE/2),
+               1, lvl->levelName.c_str());
+}
+void Renderer::drawRemainingLives() {
+  float rectWidth = 30.0f;
+  float rectHeight = 10.0f;
+  float offsetH = 20;
+  float offsetV = 15;
+  for (int i=1;i<=lvl->getLives();i++) {
+    float x1 = DISPLAY_WIDTH-SIDE_MARGIN-offsetH - rectWidth/2;
+    float x2 = (DISPLAY_WIDTH-SIDE_MARGIN-offsetH + rectWidth/2)-3;
+    float y1 = TOP_MARGIN+offsetV - rectHeight/2;
+    float y2 = TOP_MARGIN+offsetV + rectHeight/2;
+    al_draw_filled_rectangle(x1,y1,x2,y2,COLORS::GREEN);
+    offsetH+=rectWidth;
+  }
+}
+void Renderer::drawKeyInfo() {
+  float offset = 5;
+  al_draw_multiline_text(env.FONT, COLORS::FONT_C,
+                         SIDE_MARGIN+offset,
+                         DISPLAY_HEIGHT-TOP_MARGIN+offset,
+                         DISPLAY_WIDTH-SIDE_MARGIN-offset, 15,
+                         0,HELP::DISPLAY_KEY_INFO.c_str());
+}
 
+// -------------------------------------------------------------------------
+// Entities
+// -------------------------------------------------------------------------
 void Renderer::render(Entity* entity) {
   if (auto ball = dynamic_cast<Ball*>(entity)) {
     render(ball);

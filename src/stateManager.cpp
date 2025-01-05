@@ -29,6 +29,19 @@ void StateManager::update() {
   checkAllCollision();
   lvl->ball->move();
 }
+bool StateManager::isVictory() const {
+    // Récupérer  briques restantes via getContainer()
+    const auto& bricksContainer = lvl->bricks->getContainer();
+    // Vérifier si toutes les briques restantes sont dorées (non destructibles)
+    for (const auto& brick : bricksContainer) {
+        if (brick->isDestructable()) {
+            // Si on trouve une brique destructible, on n'a pas encore gagné
+            return false;
+        }
+    }
+    // Si toutes les briques restantes sont dorées, on a gagné
+    return true;
+}
 void StateManager::checkAllCollision() {
   for (auto& mask : lvl->getColisionMasks()) {
     for (const auto entityG : mask.group) {

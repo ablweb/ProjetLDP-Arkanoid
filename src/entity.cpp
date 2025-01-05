@@ -2,8 +2,8 @@
 
 #include <algorithm>
 #include <allegro5/allegro_primitives.h>
-#include <allegro5/drawing.h>
 #include <cmath>
+#include <cstdlib>
 
 #include "config.hpp"
 #include "utils.hpp"
@@ -117,25 +117,46 @@ bool CollisionCircle::checkCollision(const CollisionRect* other){
   return false;
 }
 
+void CollisionCircle::fixOverlap(DynamiqueEntity* thisEntity) {
+  if (std::abs(colPoint.x) >= std::abs(colPoint.y)) {
+    if (colPoint.x>=0) {
+      float overlap = 6;
+      thisEntity->move(overlap, 0);
+    } else {
+      float overlap = 6;
+      thisEntity->move(-overlap, 0);
+    }
+  } else {
+    if (colPoint.y>=0) {
+      float overlap = 6;
+      thisEntity->move(0, overlap);
+    } else {
+      float overlap = 6;
+      thisEntity->move(0, -overlap);
+    }
+  }
+}
+
 // -------------------------------------------------------------------------
 // Brick
 // -------------------------------------------------------------------------
 Brick::Brick(tpl position,
              BRICK_CONST::colorType brickType,
              BRICK_CONST::bonusType bonusType,
-             BrickHolder* holder)
+             BrickHolder* holder,
+             int& score)
   : Entity(position),
     CollisionRect(&this->_pos,&_w,&_h),
-    _type(brickType),_bonus(bonusType),_holder(holder) {
+    _type(brickType),_bonus(bonusType),_scoreRef(score),_holder(holder) {
   _col = BRICK_CONST::typeToColor.at(_type);
   switch (brickType) {
     case BRICK_CONST::silver:
-      _life = 2;
+      _lives = 2;
       break;
     case BRICK_CONST::gold:
-      _life = -1;
+      _lives = -1;
       break;
-    default: _life = 1;
+    default: _lives = 1;
       break;
   }
 }
@@ -143,6 +164,9 @@ Brick::~Brick() {
 }
 
 void Brick::destroy() {
+  if (_lives!=-1) {
+    _scoreRef+=(int)_type; // Update the score if brick is not undestructable
+  }
   if (_holder != nullptr) {
     _holder->removeBrick(this);
   } else {
@@ -154,24 +178,26 @@ float Brick::width() const { return _w; }
 float Brick::height() const { return _h; }
 BRICK_CONST::colorType Brick::getType() const { return _type; }
 ALLEGRO_COLOR Brick::color() const { return _col; }
+bool Brick::isDestructable() const { return _lives!=-1; }
 
 void Brick::collisionDetected(Entity*,tpl) {
-  if (_life!=-1) {
-    _life -= 1;
+  if (_lives!=-1) {
+    _lives -= 1;
   }
-  if (_life==0) {
+  if (_lives==0) {
     destroy();
   }
 }
 // -------------------------------------------------------------------------
 // BrickHolder
 // -------------------------------------------------------------------------
-BrickHolder::BrickHolder(std::vector<BRICK_CONST::Param> bricksData) {
+BrickHolder::BrickHolder(int& score, std::vector<BRICK_CONST::Param> bricksData) 
+  :_score(score) {
   for (const auto& b:bricksData) {
     addBrick(b);
   }
 }
-BrickHolder::BrickHolder() {}
+BrickHolder::BrickHolder(int& score) :_score(score) {}
 BrickHolder::~BrickHolder() {
   for (auto brick : brickContainer) {
     delete brick;
@@ -189,7 +215,8 @@ void BrickHolder::addBrick(BRICK_CONST::Param b) {
         ((float)b.row+1) * (height + spacing) + GAME_TOP_MARGIN},
     b.color,
     b.bonus,
-    this));
+    this,
+    _score));
 }
 std::vector<Brick*> BrickHolder::getContainer() const {
   return brickContainer;
@@ -230,10 +257,10 @@ void Paddle::collisionDetected(Entity*,tpl) {}
 // -------------------------------------------------------------------------
 // Ball
 // -------------------------------------------------------------------------
-Ball::Ball(tpl position, float speed, float radius, ALLEGRO_COLOR color)
+Ball::Ball(tpl position, float speed, float radius, ALLEGRO_COLOR color, int& lives)
   : DynamiqueEntity(position),
     CollisionCircle(&this->_pos,&_rad),
-    _dx(0),_dy(0),_spd(speed),_rad(radius),_col(color),isAttached(true) {} 
+    _dx(0),_dy(0),_spd(speed),_rad(radius),_col(color),_bounceCount(0),_livesRef(lives),isAttached(true) {} 
 Ball::~Ball() {}
 
 void Ball::move(float dx, float dy ) {
@@ -241,30 +268,42 @@ void Ball::move(float dx, float dy ) {
   // check if collision with left or right walls
   if ((_pos.x-_rad)<(SIDE_MARGIN)) {
     // Move the ball inside the game area
-    float overLap = (float)SIDE_MARGIN-(_pos.x-_rad);
-    move(overLap, 0);
+    float overlap = (float)SIDE_MARGIN-(_pos.x-_rad);
+    move(overlap, 0);
     bounceHorizontal();
   } else if ((_pos.x+_rad)>(DISPLAY_WIDTH-SIDE_MARGIN)) {
     // Move the ball inside the game area
-    float overLap = (_pos.x+_rad)-(float)(DISPLAY_WIDTH-SIDE_MARGIN);
-    move(-overLap, 0);
+    float overlap = (_pos.x+_rad)-(float)(DISPLAY_WIDTH-SIDE_MARGIN);
+    move(-overlap, 0);
     bounceHorizontal();
   }
   // check if collision with top or bottom walls
   if ((_pos.y-_rad)<(TOP_MARGIN) ) {
     // Move the ball inside the game area
-    float overLap = (float)TOP_MARGIN-(_pos.y-_rad);
-    move(0, overLap);
+    float overlap = (float)TOP_MARGIN-(_pos.y-_rad);
+    move(0, overlap);
     bounceVertical();
-  } else if ((_pos.y+_rad)>(DISPLAY_HEIGHT-TOP_MARGIN)) {
-    // Move the ball inside the game area
-    float overLap = (_pos.y+_rad)-(float)(DISPLAY_HEIGHT-TOP_MARGIN);
-    move(0, -overLap);
-    bounceVertical();
+  } else if ((_pos.y+_rad)>(DISPLAY_HEIGHT-TOP_MARGIN-20.0f)) {
+    // reset the ball
+    resetBall();
   }
 }
-void Ball::bounceHorizontal() { _dx = -_dx; }
-void Ball::bounceVertical() { _dy = -_dy; }
+void Ball::resetBall() {
+  _livesRef--;
+  _dx=0;_dy=0,_spd=BALL_CONST::baseSpeed;_bounceCount=0;isAttached=true;
+  _pos=BALL_CONST::spawnPosition;
+}
+void Ball::bounceHorizontal() { _dx = -_dx; _bounceCount++; updateSpeed(); }
+void Ball::bounceVertical() { _dy = -_dy; _bounceCount++;updateSpeed(); }
+void Ball::updateSpeed() {
+  if(LOG_LEVEL>=2)std::cerr<<"|Ball::speed -> "<<_spd<<"\n";
+  if (_spd>=BALL_CONST::maxSpeed) return;
+  if (_bounceCount!=0&&_bounceCount%BALL_CONST::bounceModulo==0) {
+      _spd++;
+    if(LOG)std::cerr<<"|Ball::updateSpeed() -> "<<_spd<<"\n";
+  }
+}
+
 void Ball::setDirection(float dx, float dy) {
   _dx = dx;
   _dy = dy;
@@ -283,9 +322,23 @@ ALLEGRO_COLOR Ball::color() const { return _col; }
 void Ball::go() { _dx = 0.1f; _dy = -1; isAttached=false; }
 void Ball::setPos(float x) { _pos.x = x; }
 void Ball::move() { move(_dx * _spd,_dy * _spd); }
-void Ball::handleCollision(Paddle* paddle, tpl p) {
+
+void Ball::collisionDetected(Entity* other, tpl p) {
+  if (const auto paddle = dynamic_cast<Paddle*>(other)) {
+    if (LOG_LEVEL>=2)std::cerr<<"|Ball::collisionDetected() -> Ball against Paddle\n";
+    handleCollision(paddle, p);
+  } else if (const auto brick = dynamic_cast<Brick*>(other)) {
+    if (LOG_LEVEL>=2)std::cerr<<"|Ball::collisionDetected() -> Ball against Brick\n";
+    handleCollision(brick, p);
+  }
+};
+void Ball::handleCollision(Paddle* paddle,[[maybe_unused]] tpl p) {
+  if (LOG_LEVEL>=2)std::cerr<<" |Collision Details: \n"
+    <<"  |Relative Collision Point : {"<<p.x<<","<<p.y<<"}\n"
+    <<"  |Subjects Positions : Ball{"<<_pos.x<<","<<_pos.y<<"} ; Paddle{"
+    <<paddle->x()<<","<<paddle->y()<<"}\n";
   // Calcul de la position relative de l'impact
-  float impactX = p.x - (paddle->x()-paddle->width()/2);
+  float impactX = _pos.x - (paddle->x()-paddle->width()/2);
   // Calcul de l'angle alpha (en degrés) en fonction de l'impact
   float alpha = 30 + 120 * (1 - impactX / paddle->width());
   // Conversion de l'angle en radians
@@ -297,25 +350,16 @@ void Ball::handleCollision(Paddle* paddle, tpl p) {
   float length = std::sqrt(dx * dx + dy * dy);
   setDirection(dx / length, dy / length);
 }
-void Ball::handleCollision(Brick* brick, tpl p) {
-  // float bx = brick->x(), by = brick->y(),
-  //      hw = brick->width()/2, hh = brick->height()/2;
-  std::cerr<<"|COL:\n";
-  std::cerr<<p.x<<"|"<<p.y<<"\n";
-  std::cerr<<x()<<"|"<<y()<<"\n";
-  std::cerr<<brick->x()<<"|"<<brick->y()<<"\n";
+void Ball::handleCollision([[maybe_unused]]Brick* brick, tpl p) {
+  if (LOG_LEVEL>=2)std::cerr<<" |Collision Details: \n"
+    <<"  |Relative Collision Point : {"<<p.x<<","<<p.y<<"}\n"
+    <<"  |Subjects Positions : Ball{"<<_pos.x<<","<<_pos.y<<"} ; Brick{"
+    <<brick->x()<<","<<brick->y()<<"}\n";
   if (std::abs(p.x) > std::abs(p.y)) {
-    std::cerr<<"   Horizontal side\n";
     bounceHorizontal();
+    fixOverlap(this);
   } else {
-    std::cerr<<"   Vertical side\n";
     bounceVertical();
+    fixOverlap(this);
   }
 }
-void Ball::collisionDetected(Entity* other, tpl p) {
-  if (const auto paddle = dynamic_cast<Paddle*>(other)) {
-    handleCollision(paddle, p);
-  } else if (const auto brick = dynamic_cast<Brick*>(other)) {
-    handleCollision(brick, p);
-  }
-};

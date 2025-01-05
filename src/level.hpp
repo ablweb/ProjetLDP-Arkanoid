@@ -15,7 +15,21 @@ struct CollisionGroup {
   std::vector<Entity*> masked;
 };
 
-struct Level {
+class Level {
+private:
+  int _lives;
+  int _score;
+public:
+  std::string levelName;
+  void setDefaults();
+  void addToScore(int);
+  void gainLive();
+  void loseLive();
+  int getScore() const;
+  int& getScoreRef();
+  int getLives() const;
+  int& getLivesRef();
+
   // Here add all Game Entities
   std::unique_ptr<BrickHolder> bricks;
   std::unique_ptr<Paddle> paddle;
@@ -36,7 +50,7 @@ class LevelLoader {
  public:
   LevelLoader();
   ~LevelLoader();
-  void load(size_t levelIndex, Level* lvl);
+  void load(size_t levelIndex, Level* lvl, bool resetFlag);
   void loadDefault(Level* lvl);
   size_t levelCount();
   bool isEmpty();

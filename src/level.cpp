@@ -10,11 +10,11 @@
 #include <string>
 #include <sys/types.h>
 
-#include "json.hpp"
 #include "utils.hpp"
-using json = nlohmann::json;
-
 #include "config.hpp"
+#include "json.hpp"
+
+using json = nlohmann::json;
 
 // -------------------------------------------------------------------------
 // Level
@@ -41,6 +41,16 @@ std::vector<CollisionGroup> Level::getColisionMasks() const {
   return collisionMasks;
 }
 
+void Level::setDefaults() { _score=0; _lives=3; }
+void Level::addToScore(int toAdd) { _score+=toAdd; }
+void Level::gainLive() { _lives+=1; }
+void Level::loseLive() { _lives-=1; }
+int Level::getScore() const { return _score; }
+int& Level::getScoreRef() { return _score; }
+int Level::getLives() const { return _lives; }
+int& Level::getLivesRef() { return _lives; }
+
+
 // -------------------------------------------------------------------------
 // Level Loader
 // -------------------------------------------------------------------------
@@ -52,27 +62,34 @@ LevelLoader::~LevelLoader() {}
 size_t LevelLoader::levelCount() { return levelDatas.size(); }
 bool LevelLoader::isEmpty() { return levelDatas.empty(); }
 
-void LevelLoader::load(size_t levelIndex, Level* lvl) {
+void LevelLoader::load(size_t levelIndex, Level* lvl, bool resetFlag) {
   if (levelIndex >= levelCount()) { throw std::runtime_error("No level to load");}
-  std::cerr<<"|Level::load -> Loading custom level {"<<levelNames[levelIndex]<<"}\n";
-  lvl->bricks = std::make_unique<BrickHolder>(levelDatas[levelIndex]);
+  std::string name = levelNames[levelIndex];
+  if (LOG)std::cerr<<"|Level::load -> Loading custom level {"<<name<<"}\n";
+  lvl->levelName = name.substr(name.rfind("/")+1);
+  if(resetFlag) lvl->setDefaults();
+  lvl->bricks = std::make_unique<BrickHolder>(lvl->getScoreRef(), levelDatas[levelIndex]);
   lvl->paddle = std::make_unique<Paddle>(PADDLE_CONST::spawnPosition,
                                          PADDLE_CONST::normalColor);
   lvl->ball = std::make_unique<Ball>(BALL_CONST::spawnPosition,
                                      BALL_CONST::baseSpeed,
                                      BALL_CONST::baseRadius,
-                                     BALL_CONST::normalColor);
+                                     BALL_CONST::normalColor,
+                                     lvl->getLivesRef());
 }
 
 void LevelLoader::loadDefault(Level* lvl) {
-  std::cerr<<"|Level::loadDefault -> Loading default level\n";
-  lvl->bricks = std::make_unique<BrickHolder>();
+  if (LOG)std::cerr<<"|Level::loadDefault -> Loading default level\n";
+  lvl->levelName = "default";
+  lvl->setDefaults();
+  lvl->bricks = std::make_unique<BrickHolder>(lvl->getScoreRef());
   lvl->paddle = std::make_unique<Paddle>(PADDLE_CONST::spawnPosition,
                                          PADDLE_CONST::normalColor);
   lvl->ball = std::make_unique<Ball>(BALL_CONST::spawnPosition,
                                      BALL_CONST::baseSpeed,
                                      BALL_CONST::baseRadius,
-                                     BALL_CONST::normalColor);
+                                     BALL_CONST::normalColor,
+                                     lvl->getLivesRef());
   // Generate default level (tringular shape)
   using namespace BRICK_CONST;
   for (uint col = 1;col <= 12;++col) {
@@ -87,7 +104,7 @@ void LevelLoader::loadDefault(Level* lvl) {
 }
 
 void LevelLoader::reloadFiles() {
-  std::cerr<<"|Controller::reloadFiles()\n";
+  if (LOG)std::cerr<<"|Controller::reloadFiles()\n";
   levelDatas.clear();
   levelNames.clear();
   registerLevelFiles();
@@ -106,7 +123,7 @@ void LevelLoader::registerLevelFiles() {
     }
   }
   for (const auto& filePath : sortedFiles) {
-    std::cerr<<"|Controller::registerLevelFiles() -> "<<filePath.string()<<"\n";
+    if (LOG)std::cerr<<"|Controller::registerLevelFiles() -> "<<filePath.string()<<"\n";
     if (isValidLevelFormat(filePath.string())) {
       std::vector<BRICK_CONST::Param> datas = extractLevelData(filePath.string());
       levelNames.push_back(filePath.string());

@@ -1,51 +1,37 @@
 [
-  {"row": 2, "col": 2, "color": "yellow", "bonus": "bigger"},
-  {"row": 3, "col": 2, "color": "orange", "bonus": "none"},
-  {"row": 4, "col": 2, "color": "red", "bonus": "none"},
-  {"row": 5, "col": 2, "color": "red", "bonus": "none"},
+  {"row": 6, "col": 0, "color": "yellow", "bonus": "none"},
+  {"row": 7, "col": 0, "color": "orange", "bonus": "laser"},
 
-  {"row": 2, "col": 3, "color": "orange", "bonus": "none"},
-  {"row": 3, "col": 3, "color": "red", "bonus": "none"},
-  {"row": 4, "col": 3, "color": "red", "bonus": "none"},
-  {"row": 5, "col": 3, "color": "yellow", "bonus": "interruption"},
+  {"row": 6, "col": 1, "color": "orange", "bonus": "none"},
+  {"row": 7, "col": 1, "color": "red", "bonus": "none"},
 
-  {"row": 2, "col": 4, "color": "red", "bonus": "none"},
-  {"row": 3, "col": 4, "color": "red", "bonus": "none"},
-  {"row": 4, "col": 4, "color": "yellow", "bonus": "none"},
-  {"row": 5, "col": 4, "color": "orange", "bonus": "laser"},
+  {"row": 6, "col": 2, "color": "red", "bonus": "bigger"},
+  {"row": 7, "col": 2, "color": "red", "bonus": "none"},
 
-  {"row": 2, "col": 5, "color": "red", "bonus": "none"},
-  {"row": 3, "col": 5, "color": "yellow", "bonus": "none"},
-  {"row": 4, "col": 5, "color": "orange", "bonus": "none"},
-  {"row": 5, "col": 5, "color": "red", "bonus": "none"},
+  {"row": 6, "col": 3, "color": "red", "bonus": "none"},
+  {"row": 7, "col": 3, "color": "yellow", "bonus": "interruption"},
 
-  {"row": 2, "col": 6, "color": "yellow", "bonus": "none"},
-  {"row": 3, "col": 6, "color": "orange", "bonus": "none"},
-  {"row": 4, "col": 6, "color": "red", "bonus": "none"},
-  {"row": 5, "col": 6, "color": "red", "bonus": "none"},
+  {"row": 6, "col": 4, "color": "yellow", "bonus": "none"},
+  {"row": 7, "col": 4, "color": "orange", "bonus": "laser"},
 
-  {"row": 2, "col": 7, "color": "orange", "bonus": "none"},
-  {"row": 3, "col": 7, "color": "red", "bonus": "none"},
-  {"row": 4, "col": 7, "color": "red", "bonus": "none"},
-  {"row": 5, "col": 7, "color": "yellow", "bonus": "none"},
+  {"row": 6, "col": 5, "color": "orange", "bonus": "none"},
+  {"row": 7, "col": 5, "color": "red", "bonus": "none"},
 
-  {"row": 2, "col": 8, "color": "red", "bonus": "none"},
-  {"row": 3, "col": 8, "color": "red", "bonus": "none"},
-  {"row": 4, "col": 8, "color": "yellow", "bonus": "none"},
-  {"row": 5, "col": 8, "color": "orange", "bonus": "capture"},
+  {"row": 6, "col": 6, "color": "red", "bonus": "none"},
+  {"row": 7, "col": 6, "color": "red", "bonus": "none"},
 
-  {"row": 2, "col": 9, "color": "red", "bonus": "none"},
-  {"row": 3, "col": 9, "color": "yellow", "bonus": "none"},
-  {"row": 4, "col": 9, "color": "orange", "bonus": "none"},
-  {"row": 5, "col": 9, "color": "red", "bonus": "none"},
+  {"row": 6, "col": 7, "color": "red", "bonus": "none"},
+  {"row": 7, "col": 7, "color": "yellow", "bonus": "none"},
 
-  {"row": 2, "col": 10, "color": "yellow", "bonus": "none"},
-  {"row": 3, "col": 10, "color": "orange", "bonus": "none"},
-  {"row": 4, "col": 10, "color": "red", "bonus": "player"},
-  {"row": 5, "col": 10, "color": "red", "bonus": "none"},
+  {"row": 6, "col": 8, "color": "yellow", "bonus": "none"},
+  {"row": 7, "col": 8, "color": "orange", "bonus": "capture"},
 
-  {"row": 2, "col": 11, "color": "orange", "bonus": "slow"},
-  {"row": 3, "col": 11, "color": "red", "bonus": "none"},
-  {"row": 4, "col": 11, "color": "red", "bonus": "none"},
-  {"row": 5, "col": 11, "color": "yellow", "bonus": "none"}
+  {"row": 6, "col": 9, "color": "orange", "bonus": "none"},
+  {"row": 7, "col": 9, "color": "red", "bonus": "none"},
+
+  {"row": 6, "col": 10, "color": "red", "bonus": "player"},
+  {"row": 7, "col": 10, "color": "red", "bonus": "none"},
+
+  {"row": 6, "col": 11, "color": "red", "bonus": "slow"},
+  {"row": 7, "col": 11, "color": "yellow", "bonus": "none"}
 ]
