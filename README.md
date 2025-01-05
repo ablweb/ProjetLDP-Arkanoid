@@ -1,7 +1,7 @@
 # ProjetLDP-Arkanoid
 Famous Arkanoid game written in c++ using the Allegro library
 
-#Installation
+# Installation
 ------------
 
 To build and start game:
@@ -10,14 +10,12 @@ To build and start game:
     ./arkanoid
 
 
-#Option
+# Option
 ------------
-Enable loggin
--l --log
-Enable mouse
--m --mouse
+- -l --log | Enable Logging
+- -m --mouse | Enable Mouse
 
-#How to play
+# How to play
 ------------
 
 Break all bricks to win, don't let the ball fall, you have 3 lives, each time the ball falls you lose a life.
@@ -30,7 +28,7 @@ Gold bricks are unbreakable.
     SPACE      -   Launch the ball  |  LEFT ARROW  -         Next level
     ESCAPE     -     Quit the game  |
 
-#Custom Level Formating
+# Custom Level Formating
 ----------------------
 
 The level JSON format should be an array of objects, each representing a brick in the level. Each tile must contain the following fields
