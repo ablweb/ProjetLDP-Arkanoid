@@ -5,39 +5,8 @@
 #include <allegro5/color.h>
 
 #include <iostream>
-#include <memory>
 #include <string>
 #include <unordered_map>
-#include <unordered_map>
-#include <vector>
-
-template <typename T>
-class Listener {
- public:
-  virtual void onNotify(T*) = 0;
-};
-
-template <typename T>
-class Notifier {
-  std::vector<std::weak_ptr<Listener<T>>> listeners;
-
- public:
-  void registerListener(std::weak_ptr<Listener<T>> l) {
-    std::cerr << "|Listener::registerListener() -> Registered New Listener\n";
-    listeners.push_back(l);
-  }
-  void notifyListeners(T* e) {
-    std::cerr << "|Listener::norifyListeners()\n";
-    for (auto it = listeners.begin(); it != listeners.end();) {
-      if (auto sl = it->lock()) {
-        sl->onNotify(e);
-        ++it;
-      } else {
-        it = listeners.erase(it);
-      }
-    }
-  }
-};
 
 struct tpl {
   float x = 0, y = 0;
