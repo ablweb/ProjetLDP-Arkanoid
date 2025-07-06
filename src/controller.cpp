@@ -15,6 +15,7 @@
 #include "renderer.hpp"
 #include "stateManager.hpp"
 
+// Constructor to initialize Controller with state manager, renderer, and level
 Controller::Controller(StateManagerUPtr stateManager, RendererUPtr renderer,
                        LevelSPtr level)
     : sm(std::move(stateManager)), rndr(std::move(renderer)), lvl(level),
@@ -23,11 +24,17 @@ Controller::Controller(StateManagerUPtr stateManager, RendererUPtr renderer,
 
 Controller::~Controller() {}
 
+// Handle input from the user (keyboard and mouse)
 int Controller::handleInput() {
-  int ret = 0;
+  int ret = 0; // Return value for special actions (like quitting)
+
+  // Handle key press events
   if (env.EVENT.type == ALLEGRO_EVENT_KEY_DOWN) {
+    // Transition from VICTORY or LOSE states back to IN_GAME
     if (GAME_STATE==VICTORY)GAME_STATE=IN_GAME;
     if (GAME_STATE==LOSE)GAME_STATE=IN_GAME;
+
+    // Process specific key press events
     switch (env.EVENT.keyboard.keycode) {
       case ALLEGRO_KEY_A:
         if (LOG_LEVEL>=3)std::cerr<<"|Controller::handleInput() -> KEY_A_DOWN:LEFT\n";
@@ -76,12 +83,12 @@ int Controller::handleInput() {
       default: break;
     }
   }
-  if(MOUSE) handleMouse();
+  if(MOUSE) handleMouse(); // if mouse handle is enabled
   handleContiniousKeyPress();
   return ret;
 }
-void Controller::handleMouse() {
-  int deadZonr = 12;
+void Controller::handleMouse() { // Handles mouse movement to control the paddle
+  int deadZonr = 12;    // avoid unnecessary paddle movements
   if (env.MOUSE_STATE.x>(int)lvl->paddle->x() + deadZonr) {
     sm->movePaddleRight();
   } else if (env.MOUSE_STATE.x<(int)lvl->paddle->x() - deadZonr) {
@@ -100,7 +107,9 @@ void Controller::handleContiniousKeyPress() {
 void Controller::updateGameState() {
   sm->update(); 
 }
-void Controller::checkGameState() {
+
+// Checks the status (victory, lose) and acts accordignly
+void Controller::checkGameState() { 
   if (sm->isVictory()) {
     // set global state to VICTORY
     GAME_STATE = VICTORY;
@@ -114,23 +123,26 @@ void Controller::checkGameState() {
 }
 void Controller::restartGame() {
   // reload first level
-  currentLevel = -1;
-  loadLevel(true, true);
+  currentLevel = -1; // Reset current level
+  loadLevel(true, true); 
 }
 void Controller::loadNextLevel() {
-  // load next levelME;
+  // load next level;
   loadLevel(true);
 }
+// Refresh the game display
+void Controller::refreshDisplay() { 
+  rndr->refresh();  // refresh the renderer's display
+}
 
-void Controller::refreshDisplay() { rndr->refresh(); }
-
+// Load a specific level (next or previous)
 void Controller::loadLevel(bool next, bool reset) {
   if (loader->isEmpty()) {
     if (LOG)std::cerr<<"|Controller::loadLevel() -> No levels registered. Loading default level.\n";
     loader->loadDefault(lvl.get());
     return;
   }
-  size_t index;
+  size_t index; // calculates the index of the level to load
   if (next) {
     index = ((size_t)currentLevel+1) % loader->levelCount();
   } else {
