@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <allegro5/allegro_primitives.h>
 #include <allegro5/allegro_font.h>
+#include <allegro5/allegro_ttf.h>         
 #include <cmath>
 #include <cstdlib>
 
@@ -24,6 +25,8 @@ float Entity::y() const { return _pos.y; }
 // -------------------------------------------------------------------------
 DynamiqueEntity::DynamiqueEntity(tpl position) : Entity(position) {}
 void DynamiqueEntity::move(float dx, float dy) {
+  _pos.x+=dx;
+  _pos.y+=dy;
 }
 
 // -------------------------------------------------------------------------
