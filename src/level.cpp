@@ -68,7 +68,7 @@ void LevelLoader::load(size_t levelIndex, Level* lvl, bool resetFlag) {
   if (LOG)std::cerr<<"|Level::load -> Loading custom level {"<<name<<"}\n";
   lvl->levelName = name.substr(name.rfind("/")+1);
   if(resetFlag) lvl->setDefaults();
-  lvl->bricks = std::make_unique<BrickHolder>(lvl->getScoreRef(), levelDatas[levelIndex]);
+  lvl->bricks = std::make_unique<BrickHolder>(lvl, lvl->getScoreRef(), levelDatas[levelIndex]);
   lvl->paddle = std::make_unique<Paddle>(PADDLE_CONST::spawnPosition,
                                          PADDLE_CONST::normalColor);
   lvl->ball = std::make_unique<Ball>(BALL_CONST::spawnPosition,
@@ -82,7 +82,7 @@ void LevelLoader::loadDefault(Level* lvl) {
   if (LOG)std::cerr<<"|Level::loadDefault -> Loading default level\n";
   lvl->levelName = "default";
   lvl->setDefaults();
-  lvl->bricks = std::make_unique<BrickHolder>(lvl->getScoreRef());
+  lvl->bricks = std::make_unique<BrickHolder>(lvl, lvl->getScoreRef());
   lvl->paddle = std::make_unique<Paddle>(PADDLE_CONST::spawnPosition,
                                          PADDLE_CONST::normalColor);
   lvl->ball = std::make_unique<Ball>(BALL_CONST::spawnPosition,

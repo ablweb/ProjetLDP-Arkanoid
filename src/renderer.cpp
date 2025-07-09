@@ -139,6 +139,22 @@ void Renderer::render(Brick* brick) {
     color = COLORS::WHITE;thickness = 2;offset = 1;
   }
   al_draw_rectangle(x1+offset, y1+offset, x2-offset, y2-offset, color, thickness);
+
+  // Affichage de la lettre bonus si elle existe
+  if (brick->hasBonus()) {
+  char letter = bonusToChar(brick->getBonus());
+
+  ALLEGRO_FONT* font = al_create_builtin_font(); // Police simple intégrée
+  al_draw_textf(
+    font,
+    COLORS::BLACK,     // Couleur du texte
+    brick->x(),        // Centre X de la brique
+    brick->y() - 5,    // Y légèrement ajusté vers le haut
+    ALLEGRO_ALIGN_CENTER,
+    "%c", letter
+  );
+  al_destroy_font(font); // Libération mémoire
+}
 }
 
 void Renderer::render(Paddle* paddle) {

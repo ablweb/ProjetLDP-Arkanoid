@@ -9,6 +9,8 @@ class BrickHolder;
 class Brick;
 class Paddle;
 class Ball;
+class Bonus;
+
 
 typedef std::shared_ptr<const Level> ConstLevelSPtr;
 
@@ -30,6 +32,7 @@ class Renderer {
   void render(Brick*);
   void render(Paddle*);
   void render(Ball*);
+  void render(Bonus*);
 
   void drawVictoryMessage();
   void drawLoseMessage();

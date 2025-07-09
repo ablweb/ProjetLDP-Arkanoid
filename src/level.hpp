@@ -34,6 +34,7 @@ public:
   std::unique_ptr<BrickHolder> bricks;
   std::unique_ptr<Paddle> paddle;
   std::unique_ptr<Ball> ball;
+  std::vector<Bonus*> activeBonuses;
   // Also add them to the return vector of all()
   std::vector<Entity*> all() const;
   std::vector<CollisionGroup> getColisionMasks() const;

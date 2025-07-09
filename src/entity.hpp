@@ -106,8 +106,11 @@ public:
   float width() const;
   float height() const;
   BRICK_CONST::colorType getType() const;
+  BRICK_CONST::bonusType getBonus() const;
+
   ALLEGRO_COLOR color() const;
   bool isDestructable() const;
+  bool hasBonus() const;
 
   void collisionDetected(Entity*,tpl) override;
 };
@@ -115,16 +118,20 @@ public:
 // -------------------------------------------------------------------------
 // BrickHolder
 // -------------------------------------------------------------------------
+class Level; 
+
 class BrickHolder {
 private:
   std::vector<Brick*> brickContainer;
   static constexpr int maxRow = 8;
   static constexpr int maxCol = 14;
-
+  Level* _level;
   int& _score;
 public:
-  BrickHolder(int& score);
-  BrickHolder(int& score, std::vector<BRICK_CONST::Param> bricksData);
+  BrickHolder(Level* level,int& score);
+  Level* getLevel() const { return _level; } 
+
+  BrickHolder(Level* level, int& score, std::vector<BRICK_CONST::Param> bricksData);
   ~BrickHolder();
 
   std::vector<Brick*> getContainer() const;
@@ -186,4 +193,28 @@ class Ball : public DynamiqueEntity, public CollisionCircle {
   void handleCollision(Paddle* paddle, tpl collisionPoint);
 };
 
+class Bonus :  public DynamiqueEntity, public CollisionCircle {
+ private:
+  float _velocityY;
+  float _radius = 10.0f;
+  char _letter;
+  bool _active;
+  ALLEGRO_COLOR _color;
+  
+
+  float groundLevel() const;
+  void onGroundCollision();
+ public:
+  Bonus(float x, float y, char letter, ALLEGRO_COLOR color);
+  ~Bonus();
+
+  void activate();                    // Lancer la descente
+  void update(float deltaTime);      // Mettre à jour la position
+  void render() const;               // Dessiner le bonus
+  void collisionDetected(Entity*, tpl) override; // Gérer la collision avec paddle
+
+  char getLetter() const;            // ✅ pour afficher la lettre
+  bool isActive() const;             // ✅ savoir s’il est actif
+  tpl position() const { return _pos; } // Accès à la position
+};
 #endif

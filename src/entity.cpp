@@ -2,11 +2,15 @@
 
 #include <algorithm>
 #include <allegro5/allegro_primitives.h>
+#include <allegro5/allegro_font.h>
 #include <cmath>
 #include <cstdlib>
 
+
 #include "config.hpp"
 #include "utils.hpp"
+#include "env.hpp"
+#include "level.hpp"
 
 // -------------------------------------------------------------------------
 // Entity
@@ -20,7 +24,6 @@ float Entity::y() const { return _pos.y; }
 // -------------------------------------------------------------------------
 DynamiqueEntity::DynamiqueEntity(tpl position) : Entity(position) {}
 void DynamiqueEntity::move(float dx, float dy) {
-  _pos.x+=dx;_pos.y+=dy;
 }
 
 // -------------------------------------------------------------------------
@@ -140,14 +143,10 @@ void CollisionCircle::fixOverlap(DynamiqueEntity* thisEntity) {
 // -------------------------------------------------------------------------
 // Brick
 // -------------------------------------------------------------------------
-Brick::Brick(tpl position,
-             BRICK_CONST::colorType brickType,
-             BRICK_CONST::bonusType bonusType,
-             BrickHolder* holder,
-             int& score)
-  : Entity(position),
-    CollisionRect(&this->_pos,&_w,&_h),
-    _type(brickType),_bonus(bonusType),_scoreRef(score),_holder(holder) {
+Brick::Brick(tpl position, BRICK_CONST::colorType brickType, BRICK_CONST::bonusType bonusType, BrickHolder* holder,int& score):
+  Entity(position),
+  CollisionRect(&this->_pos,&_w,&_h),
+  _type(brickType),_bonus(bonusType),_scoreRef(score),_holder(holder) {
   _col = BRICK_CONST::typeToColor.at(_type);
   switch (brickType) {
     case BRICK_CONST::silver:
@@ -167,6 +166,21 @@ void Brick::destroy() {
   if (_lives!=-1) {
     _scoreRef+=(int)_type; // Update the score if brick is not undestructable
   }
+  // --- BONUS SPAWN ---
+  if (_bonus != BRICK_CONST::none && _holder != nullptr) {
+    // Récupère la lettre du bonus
+    char bonusChar = bonusToChar(_bonus);
+
+    // Crée un nouveau bonus à la position de la brique
+    Bonus* newBonus = new Bonus(_pos.x, _pos.y, bonusChar, COLORS::WHITE);
+    newBonus->activate(); // le fait tomber
+
+    // Accède au niveau via le BrickHolder et ajoute le bonus
+    if (_holder) {
+    _holder->getLevel()->activeBonuses.push_back(newBonus);
+}
+  }
+
   if (_holder != nullptr) {
     _holder->removeBrick(this);
   } else {
@@ -177,9 +191,14 @@ void Brick::destroy() {
 float Brick::width() const { return _w; }
 float Brick::height() const { return _h; }
 BRICK_CONST::colorType Brick::getType() const { return _type; }
+BRICK_CONST::bonusType Brick::getBonus() const {return _bonus;}
+
 ALLEGRO_COLOR Brick::color() const { return _col; }
 bool Brick::isDestructable() const { return _lives!=-1; }
 
+bool Brick::hasBonus() const {
+  return _bonus != BRICK_CONST::none;
+}
 void Brick::collisionDetected(Entity*,tpl) {
   if (_lives!=-1) {
     _lives -= 1;
@@ -191,13 +210,14 @@ void Brick::collisionDetected(Entity*,tpl) {
 // -------------------------------------------------------------------------
 // BrickHolder
 // -------------------------------------------------------------------------
-BrickHolder::BrickHolder(int& score, std::vector<BRICK_CONST::Param> bricksData) 
-  :_score(score) {
+BrickHolder::BrickHolder(Level* level, int& score, std::vector<BRICK_CONST::Param> bricksData) 
+  :_level(level), _score(score) {
   for (const auto& b:bricksData) {
     addBrick(b);
   }
 }
-BrickHolder::BrickHolder(int& score) :_score(score) {}
+BrickHolder::BrickHolder(Level* level, int& score) 
+  : _level(level), _score(score) {}
 BrickHolder::~BrickHolder() {
   for (auto brick : brickContainer) {
     delete brick;
@@ -337,14 +357,14 @@ void Ball::handleCollision(Paddle* paddle,[[maybe_unused]] tpl p) {
     <<"  |Relative Collision Point : {"<<p.x<<","<<p.y<<"}\n"
     <<"  |Subjects Positions : Ball{"<<_pos.x<<","<<_pos.y<<"} ; Paddle{"
     <<paddle->x()<<","<<paddle->y()<<"}\n";
-  // Calcul de la position relative de l'impact
+  // Calculate the relative impact  position 
   float impactX = _pos.x - (paddle->x()-paddle->width()/2);
-  // Calcul de l'angle alpha (en degrés) en fonction de l'impact
+  // Calculate angle alpha (in degrees) in fonction of impact
   float alpha = 30 + 120 * (1 - impactX / paddle->width());
-  // Conversion de l'angle en radians
-  float alphaRadians = alpha * M_PIf / 180.0f;
+  // Conversion of angle to  radians
+  float alphaRadians = alpha * M_PI / 180.0f;
 
-  // Calcul du vecteur direction
+  // Calculate  direction vector
   float dx = std::cos(alphaRadians);
   float dy = -std::sin(alphaRadians);
   float length = std::sqrt(dx * dx + dy * dy);
@@ -362,4 +382,68 @@ void Ball::handleCollision([[maybe_unused]]Brick* brick, tpl p) {
     bounceVertical();
     fixOverlap(this);
   }
+}
+
+
+// -------------------------------------------------------------------------
+// Bonus Implementation
+// -------------------------------------------------------------------------
+Bonus::Bonus(float x, float y, char letter, ALLEGRO_COLOR color)
+  : DynamiqueEntity({x, y}),
+    CollisionCircle(&_pos, &_radius),
+    _velocityY(0.0f),
+    _letter(letter),
+    _active(false),
+    _color(color) {}
+
+Bonus::~Bonus() {}
+
+void Bonus::activate() {
+  _active = true;
+  _velocityY = 0.5f; // Initial falling speed
+}
+
+void Bonus::update(float deltaTime) {
+  if (!_active) return;
+
+  // Simulate falling
+  this->_pos.y += _velocityY * deltaTime;
+
+  // Apply gravity
+  _velocityY += 0.05f * deltaTime;
+
+  // Check if it hits the ground
+  if (this->_pos.y >= groundLevel()) {
+    _active = false;
+    onGroundCollision();
+  }
+}
+
+void Bonus::render() const {
+  if (!_active) return;
+
+  // Render the capsule shape and letter
+  al_draw_filled_circle(this->x(), this->y(), _radius, _color);
+  al_draw_textf(al_create_builtin_font(), _color, this->x(), this->y(), ALLEGRO_ALIGN_CENTER, "%c", _letter);
+}
+
+float Bonus::groundLevel() const {
+  return 600.0f; // Example ground level
+}
+
+void Bonus::onGroundCollision() {
+  std::cout << "Bonus with letter " << _letter << " hit the ground.\n";
+  // Handle ground collision logic (e.g., deactivate bonus)
+}
+
+char Bonus::getLetter() const {
+  return _letter;
+}
+
+bool Bonus::isActive() const {
+  return _active;
+}
+
+void Bonus::collisionDetected(Entity*, tpl) {
+  // À remplir si tu veux une interaction avec paddle, sinon vide pour l’instant
 }
