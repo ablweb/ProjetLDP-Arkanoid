@@ -152,6 +152,16 @@ constexpr float deadzone = 20.0; // deadzone from bottom of game view
 const ALLEGRO_COLOR normalColor = COLORS::GREEN_B;
 } // PADDLE_CONST
 
+enum bonusType {
+  none = 0,
+  laser,
+  bigger,
+  capture,
+  slow,
+  interruption,
+  player
+};
+
 inline char bonusToChar(BRICK_CONST::bonusType bonus) {
   using namespace BRICK_CONST;
   switch (bonus) {

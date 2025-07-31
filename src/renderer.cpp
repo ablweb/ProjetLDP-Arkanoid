@@ -144,17 +144,10 @@ void Renderer::render(Brick* brick) {
   if (brick->hasBonus()) {
   char letter = bonusToChar(brick->getBonus());
 
-  ALLEGRO_FONT* font = al_create_builtin_font(); // Police simple intégrée
-  al_draw_textf(
-    font,
-    COLORS::BLACK,     // Couleur du texte
-    brick->x(),        // Centre X de la brique
-    brick->y() - 5,    // Y légèrement ajusté vers le haut
-    ALLEGRO_ALIGN_CENTER,
-    "%c", letter
-  );
-  al_destroy_font(font); // Libération mémoire
-}
+    ALLEGRO_FONT* font = al_create_builtin_font(); // Police simple intégrée
+    al_draw_textf(font,COLORS::BLACK,brick->x(), brick->y() - 5, ALLEGRO_ALIGN_CENTER,"%c", letter);
+    al_destroy_font(font); // Libération mémoire
+  }
 }
 
 void Renderer::render(Paddle* paddle) {
