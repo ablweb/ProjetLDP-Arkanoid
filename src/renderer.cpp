@@ -142,7 +142,7 @@ void Renderer::render(Brick* brick) {
 
   // Affichage de la lettre bonus si elle existe
   if (brick->hasBonus()) {
-  char letter = bonusToChar(brick->getBonus());
+    char letter = bonusToChar(brick->getBonus());
 
     ALLEGRO_FONT* font = al_create_builtin_font(); // Police simple intégrée
     al_draw_textf(font,COLORS::BLACK,brick->x(), brick->y() - 5, ALLEGRO_ALIGN_CENTER,"%c", letter);
