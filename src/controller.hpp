@@ -43,7 +43,7 @@ class Controller {
   int currentLevel;
   int handleInput();
   void handleMouse();
-  void updateGameState();
+  void updateGameState(float deltaTime);
   void checkGameState();
   void refreshDisplay();
   void loadLevel(bool next, bool reset=false);

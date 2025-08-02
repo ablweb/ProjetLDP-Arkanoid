@@ -19,12 +19,16 @@ class Level {
 private:
   int _lives;
   int _score;
+
 public:
   std::string levelName;
   void setDefaults();
   void addToScore(int);
   void gainLive();
   void loseLive();
+  void update(float deltaTime);
+  void applyBonus(Bonus* bonus);
+
   int getScore() const;
   int& getScoreRef();
   int getLives() const;
@@ -35,6 +39,14 @@ public:
   std::unique_ptr<Paddle> paddle;
   std::unique_ptr<Ball> ball;
   std::vector<Bonus*> activeBonuses;
+  struct TimedBonus {
+  char type;
+  float remainingTime;
+};
+
+std::vector<TimedBonus> activeTimedBonuses;
+  
+
   // Also add them to the return vector of all()
   std::vector<Entity*> all() const;
   std::vector<CollisionGroup> getColisionMasks() const;

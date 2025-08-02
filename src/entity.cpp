@@ -81,6 +81,10 @@ bool CollisionRect::checkCollision(const CollisionCircle* other){
   return false;
 }
 
+void CollisionRect::updateWidthPointer(float* newWidth) {
+  _c_w = newWidth;
+}
+
 // -------------------------------------------------------------------------
 // CollisionCircle
 // -------------------------------------------------------------------------
@@ -275,7 +279,17 @@ float Paddle::height() const { return _h; }
 ALLEGRO_COLOR Paddle::color() const { return _col; }
 
 void Paddle::move(bool direction) { move(direction?_spd:-_spd, 0); }
+void Paddle::widen(float factor) {
+  _w *= factor;
+  updateWidthPointer(&_w); // On met à jour le pointeur privé via la méthode publique
+}
+  
 void Paddle::collisionDetected(Entity*,tpl) {}
+void Paddle::resetWidth() {
+  _w = PADDLE_CONST::spawnWidth;
+  updateWidthPointer(&_w); // Update CollisionRect's internal pointer
+}
+
 
 // -------------------------------------------------------------------------
 // Ball
@@ -346,6 +360,18 @@ void Ball::go() { _dx = 0.1f; _dy = -1; isAttached=false; }
 void Ball::setPos(float x) { _pos.x = x; }
 void Ball::move() { move(_dx * _spd,_dy * _spd); }
 
+float Ball::getSpeed() const {
+  return _spd;
+}
+
+void Ball::setSpeed(float speed) {
+  // Optionnel : Limiter la vitesse minimale et maximale
+  if (speed < 1.0f) speed = 1.0f;
+  if (speed > BALL_CONST::maxSpeed) speed = BALL_CONST::maxSpeed;
+  _spd = speed;
+}
+
+
 void Ball::collisionDetected(Entity* other, tpl p) {
   if (const auto paddle = dynamic_cast<Paddle*>(other)) {
     if (LOG_LEVEL>=2)std::cerr<<"|Ball::collisionDetected() -> Ball against Paddle\n";
@@ -393,30 +419,31 @@ void Ball::handleCollision([[maybe_unused]]Brick* brick, tpl p) {
 // -------------------------------------------------------------------------
 Bonus::Bonus(float x, float y, char letter, ALLEGRO_COLOR color)
   : DynamiqueEntity({x, y}),
-    CollisionCircle(&_pos, &_radius),
-    _velocityY(0.0f),
-    _letter(letter),
-    _active(false),
-    _color(color) {}
+    CollisionCircle(&this->_pos, &_radius),
+    _velocityY(0.5f), // Initial vertical velocity
+    _radius(10.0f),  
+    _letter(letter),  // Letter representing the bonus
+    _active(false),  // Initially inactive
+    _color(color) {} 
 
 Bonus::~Bonus() {}
 
 void Bonus::activate() {
   _active = true;
-  _velocityY = 0.5f; // Initial falling speed
 }
 
 void Bonus::update(float deltaTime) {
   if (!_active) return;
 
-  // Simulate falling
-  this->_pos.y += _velocityY * deltaTime;
+  // Simulate falling with gravity
+  _pos.y += _velocityY * deltaTime;
 
   // Apply gravity
-  _velocityY += 0.05f * deltaTime;
+  _velocityY += 300.0f * deltaTime;
 
   // Check if it hits the ground
-  if (this->_pos.y >= groundLevel()) {
+  if (_pos.y >= groundLevel()) {
+    _pos.y = groundLevel(); // Clamp to ground level
     _active = false;
     onGroundCollision();
   }
@@ -431,7 +458,7 @@ void Bonus::render() const {
 }
 
 float Bonus::groundLevel() const {
-  return 600.0f; // Example ground level
+  return DISPLAY_HEIGHT - 5.0f; // tout en bas
 }
 
 void Bonus::onGroundCollision() {
@@ -449,4 +476,8 @@ bool Bonus::isActive() const {
 
 void Bonus::collisionDetected(Entity*, tpl) {
   // À remplir si tu veux une interaction avec paddle, sinon vide pour l’instant
+}
+
+void Bonus::deactivate() {
+  _active = false;
 }

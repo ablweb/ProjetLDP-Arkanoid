@@ -40,6 +40,7 @@ void GameEngine::generateController() {
 void GameEngine::run() {
   al_start_timer(env.TIMER);
   controller->loadLevel(1, true);
+  double lastTime = al_get_time();
   while (running) {
     al_wait_for_event(env.QUEUE, &env.EVENT);
     al_get_mouse_state(&env.MOUSE_STATE);
@@ -50,7 +51,10 @@ void GameEngine::run() {
       running = false;
     }
     if (env.EVENT.type == ALLEGRO_EVENT_TIMER) {
-      controller->updateGameState();
+      double currentTime = al_get_time();
+      float deltaTime = currentTime - lastTime;
+      lastTime = currentTime;
+      controller->updateGameState(deltaTime);
       controller->refreshDisplay();
       controller->checkGameState(); // check Victory or Lose
     }

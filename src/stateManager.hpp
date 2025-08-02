@@ -32,7 +32,7 @@ class StateManager {
   void movePaddleRight();
   void movePaddleLeft();
   void launchBall();
-  void update();
+  void update(float deltaTime);
   bool isVictory() const;
   bool isLose() const;
 

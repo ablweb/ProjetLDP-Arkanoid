@@ -23,6 +23,11 @@ void Renderer::refresh() {
     for (Entity* entity : lvl->all()) {
       render(entity);
     }
+    for (Bonus* bonus : lvl->activeBonuses) {
+      if (bonus != nullptr && bonus->isActive()) {
+        bonus->render();
+      }
+    }
   }
   else if (GAME_STATE==VICTORY) {
     drawVictoryMessage();

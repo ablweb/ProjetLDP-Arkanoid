@@ -104,8 +104,8 @@ void Controller::handleContiniousKeyPress() {
   }
 }
 
-void Controller::updateGameState() {
-  sm->update(); 
+void Controller::updateGameState(float deltaTime) {
+  sm->update(deltaTime); 
 }
 
 // Checks the status (victory, lose) and acts accordignly

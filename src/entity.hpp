@@ -56,6 +56,7 @@ public:
   bool checkCollision(const CollisionRect* other);
   bool checkCollision(const CollisionCircle* other);
   virtual void collisionDetected(Entity*,tpl) = 0;
+void updateWidthPointer(float* newWidth);  
 };
 
 // -------------------------------------------------------------------------
@@ -157,7 +158,10 @@ class Paddle : public DynamiqueEntity, public CollisionRect {
   ALLEGRO_COLOR color() const;
 
   void move(bool direction);
+  void widen(float factor = 1.5f);
   void collisionDetected(Entity*,tpl) override;
+  void resetWidth();
+
 };
 
 // -------------------------------------------------------------------------
@@ -186,12 +190,18 @@ class Ball : public DynamiqueEntity, public CollisionCircle {
   void go();
   void setPos(float x);
   void move();
+  float getSpeed() const;
+  void setSpeed(float speed);
 
   void collisionDetected(Entity*,tpl) override;
  private:
   void handleCollision(Brick* brick, tpl collisionPoint);
   void handleCollision(Paddle* paddle, tpl collisionPoint);
 };
+
+// -------------------------------------------------------------------------
+// Bonus
+// -------------------------------------------------------------------------
 
 class Bonus :  public DynamiqueEntity, public CollisionCircle {
  private:
@@ -212,9 +222,10 @@ class Bonus :  public DynamiqueEntity, public CollisionCircle {
   void update(float deltaTime);      // Mettre à jour la position
   void render() const;               // Dessiner le bonus
   void collisionDetected(Entity*, tpl) override; // Gérer la collision avec paddle
+  void deactivate(); // dans la déclaration
 
-  char getLetter() const;            // ✅ pour afficher la lettre
-  bool isActive() const;             // ✅ savoir s’il est actif
+  char getLetter() const;            // pour afficher la lettre
+  bool isActive() const;             //  savoir s’il est actif
   tpl position() const { return _pos; } // Accès à la position
 };
 #endif

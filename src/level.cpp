@@ -45,6 +45,71 @@ void Level::setDefaults() { _score=0; _lives=3; }
 void Level::addToScore(int toAdd) { _score+=toAdd; }
 void Level::gainLive() { _lives+=1; }
 void Level::loseLive() { _lives-=1; }
+void Level::update(float deltaTime) {
+  for (auto it = activeBonuses.begin(); it != activeBonuses.end(); ) {
+    Bonus* bonus = *it;
+    if (bonus && bonus->isActive()) {
+      bonus->update(deltaTime); // Use passed deltaTime
+      if (bonus->checkCollision(paddle.get())) {
+        applyBonus(bonus);
+        bonus->deactivate(); // Deactivate the bonus after applying it
+        delete bonus;
+        it = activeBonuses.erase(it);
+        continue;
+      }
+    }
+    // Remove bonuses that hit the ground (deactivated but not collected)
+    if (!bonus->isActive()) {
+      delete bonus;
+      it = activeBonuses.erase(it);
+      continue;
+    }
+    ++it;
+  }
+
+  // Update and manage expiration of activeTimedBonuses
+  for (auto it = activeTimedBonuses.begin(); it != activeTimedBonuses.end(); ) {
+    it->remainingTime -= deltaTime; // Use passed deltaTime
+
+    if (it->remainingTime <= 0.0f) {
+      switch (it->type) {
+        case 'B': // Reset paddle width
+          if (paddle) paddle->resetWidth();
+          break;
+        case 'S': // Reset ball speed
+          if (ball) ball->setSpeed(BALL_CONST::baseSpeed);
+          break;
+      }
+      it = activeTimedBonuses.erase(it);
+    } else {
+      ++it;
+    }
+  }
+}
+
+void Level::applyBonus(Bonus* bonus) {
+  char letter = bonus->getLetter();
+  switch (letter) {
+    case 'L': // Gain one life
+      gainLive();
+      break;
+    case 'B': // Widen paddle
+      if (paddle) {
+        paddle->widen();
+        activeTimedBonuses.push_back({'B', 15.0f});
+      }
+      break;
+    case 'S': // Slow down the ball
+      if (ball) {
+        ball->setSpeed(ball->getSpeed() * 0.8f);
+        activeTimedBonuses.push_back({'S', 15.0f});
+      }
+      break;
+    default:
+      std::cerr << "|Level::applyBonus -> Unknown bonus letter: " << letter << "\n";
+      break;
+  }
+}
 int Level::getScore() const { return _score; }
 int& Level::getScoreRef() { return _score; }
 int Level::getLives() const { return _lives; }

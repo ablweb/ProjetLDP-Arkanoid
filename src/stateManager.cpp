@@ -24,10 +24,11 @@ void StateManager::launchBall() {
     lvl->ball->go();
   }
 }
-void StateManager::update() {
+void StateManager::update(float deltaTime) {
   // Here add state update that should happen each frame
   checkAllCollision();
   lvl->ball->move();
+  lvl->update(deltaTime);
 }
 bool StateManager::isVictory() const {
     // Récupérer  briques restantes via getContainer()
