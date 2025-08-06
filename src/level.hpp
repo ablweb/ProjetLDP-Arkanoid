@@ -39,6 +39,7 @@ public:
   std::unique_ptr<Paddle> paddle;
   std::unique_ptr<Ball> ball;
   std::vector<Bonus*> activeBonuses;
+  std::vector<std::unique_ptr<Ball>> extraBalls;
   struct TimedBonus {
   char type;
   float remainingTime;

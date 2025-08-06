@@ -36,7 +36,6 @@ class Renderer {
 
   void drawVictoryMessage();
   void drawLoseMessage();
-  // add new render methodes with other parameters
  private:
   void drawBackground();
   void drawGameInfo();

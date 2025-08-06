@@ -26,6 +26,9 @@ std::vector<Entity*> Level::all() const {
   }
   allEntities.push_back(paddle.get());
   allEntities.push_back(ball.get());
+  for (const auto& b : extraBalls) {
+    allEntities.push_back(b.get());
+  }
   return allEntities;
 }
 
@@ -79,6 +82,9 @@ void Level::update(float deltaTime) {
         case 'S': // Reset ball speed
           if (ball) ball->setSpeed(BALL_CONST::baseSpeed);
           break;
+        case 'C': // Auto-release capture
+          if (ball) ball->release(); // Implement release() in Ball
+          break;
       }
       it = activeTimedBonuses.erase(it);
     } else {
@@ -90,7 +96,7 @@ void Level::update(float deltaTime) {
 void Level::applyBonus(Bonus* bonus) {
   char letter = bonus->getLetter();
   switch (letter) {
-    case 'L': // Gain one life
+    case 'P': // Gain one life
       gainLive();
       break;
     case 'B': // Widen paddle
@@ -105,6 +111,39 @@ void Level::applyBonus(Bonus* bonus) {
         activeTimedBonuses.push_back({'S', 15.0f});
       }
       break;
+    /*case 'L': // Laser bonus
+      if (paddle) {
+        paddle->activateLaser();
+        activeTimedBonuses.push_back({'L', 15.0f});
+      }
+      break;*/
+    case 'C': // Capture bonus: ball sticks to the paddle
+      if (ball) {
+        ball->attachTo(paddle.get());  // You need to implement this in the Ball class
+        activeTimedBonuses.push_back({'C', 5.0f}); // Auto-release after 5 seconds
+      }
+      break;
+    case 'I': { // Interruption bonus : create 3 new balls
+      if (ball) {
+        for (int i = 0; i < 3; ++i) {
+          tpl newBallPos = {ball->x(), ball->y()};
+          std::unique_ptr<Ball> newBall = std::make_unique<Ball>(
+            newBallPos,
+            ball->getSpeed(),
+            ball->radius(),
+            ball->color(),
+            getLivesRef()
+          );
+
+          // Set direction spreading from -0.8 to +0.8 (e.g. -0.8, 0, +0.8)
+          float spreadX = (i - 1) * 0.8f; // i=0: -0.8, i=1: 0, i=2: +0.8
+          newBall->setDirection(spreadX, -1.0f); // Always shoot upward
+          newBall->go(); // Detach and start moving
+          extraBalls.push_back(std::move(newBall));
+        }
+      }
+      break;
+    }
     default:
       std::cerr << "|Level::applyBonus -> Unknown bonus letter: " << letter << "\n";
       break;

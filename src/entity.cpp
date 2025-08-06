@@ -353,13 +353,22 @@ void Ball::setDirection(float dx, float dy) {
   }
 }
 
+
+
 float Ball::radius() const { return _rad; }
 ALLEGRO_COLOR Ball::color() const { return _col; }
 
 void Ball::go() { _dx = 0.1f; _dy = -1; isAttached=false; }
 void Ball::setPos(float x) { _pos.x = x; }
-void Ball::move() { move(_dx * _spd,_dy * _spd); }
+void Ball::move() {
+  if (isAttached && _attachedPaddle) {
+    _pos.x = _attachedPaddle->x(); // Suivre la raquette en X
+    _pos.y = _attachedPaddle->y() - _rad - 1.0f; // Positionner juste au-dessus
+    return; // Ne pas appliquer de mouvement tant que attachée
+  }
 
+  move(_dx * _spd, _dy * _spd); // Appliquer le mouvement uniquement si détachée
+}
 float Ball::getSpeed() const {
   return _spd;
 }
@@ -369,6 +378,22 @@ void Ball::setSpeed(float speed) {
   if (speed < 1.0f) speed = 1.0f;
   if (speed > BALL_CONST::maxSpeed) speed = BALL_CONST::maxSpeed;
   _spd = speed;
+}
+
+void Ball::attachTo(Paddle* paddle) {
+  _attachedPaddle = paddle;
+  isAttached = true;
+  setSpeed(BALL_CONST::baseSpeed); // Optionally reset speed
+}
+
+void Ball::release() {
+  _attachedPaddle = nullptr;
+  isAttached = false;
+  go(); // Launch the ball
+}
+
+bool Ball::isBallAttached() const {
+  return isAttached;
 }
 
 
@@ -458,12 +483,11 @@ void Bonus::render() const {
 }
 
 float Bonus::groundLevel() const {
-  return DISPLAY_HEIGHT - 5.0f; // tout en bas
+  return DISPLAY_HEIGHT - 5.0f; 
 }
 
 void Bonus::onGroundCollision() {
   std::cout << "Bonus with letter " << _letter << " hit the ground.\n";
-  // Handle ground collision logic (e.g., deactivate bonus)
 }
 
 char Bonus::getLetter() const {

@@ -178,7 +178,9 @@ class Ball : public DynamiqueEntity, public CollisionCircle {
   void bounceHorizontal();
   void bounceVertical();
   void updateSpeed();
-  void setDirection(float dx, float dy);
+
+  // --- Bonus 'C' (capture) support ---
+  Paddle* _attachedPaddle = nullptr;
  public:
   Ball(tpl position, float speed, float radius, ALLEGRO_COLOR color, int& lives);
   ~Ball();
@@ -187,11 +189,17 @@ class Ball : public DynamiqueEntity, public CollisionCircle {
   float radius() const;
   ALLEGRO_COLOR color() const;
 
+  void setDirection(float dx, float dy);
   void go();
   void setPos(float x);
   void move();
   float getSpeed() const;
   void setSpeed(float speed);
+
+  // Bonus 'C' (capture) methods
+  void attachTo(Paddle* paddle);
+  void release();
+  bool isBallAttached() const;
 
   void collisionDetected(Entity*,tpl) override;
  private:
@@ -221,7 +229,7 @@ class Bonus :  public DynamiqueEntity, public CollisionCircle {
   void activate();                    // Lancer la descente
   void update(float deltaTime);      // Mettre à jour la position
   void render() const;               // Dessiner le bonus
-  void collisionDetected(Entity*, tpl) override; // Gérer la collision avec paddle
+  void collisionDetected(Entity*, tpl) override;
   void deactivate(); // dans la déclaration
 
   char getLetter() const;            // pour afficher la lettre
