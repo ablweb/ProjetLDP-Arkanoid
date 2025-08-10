@@ -13,6 +13,7 @@
 #include "env.hpp"
 #include "level.hpp"
 #include "renderer.hpp"
+#include "config.hpp"
 #include "stateManager.hpp"
 
 // Constructor to initialize Controller with state manager, renderer, and level
@@ -88,10 +89,9 @@ int Controller::handleInput() {
   return ret;
 }
 void Controller::handleMouse() { // Handles mouse movement to control the paddle
-  int deadZonr = 12;    // avoid unnecessary paddle movements
-  if (env.MOUSE_STATE.x>(int)lvl->paddle->x() + deadZonr) {
+  if (env.MOUSE_STATE.x>(int)lvl->paddle->x() + LIMIT) {
     sm->movePaddleRight();
-  } else if (env.MOUSE_STATE.x<(int)lvl->paddle->x() - deadZonr) {
+  } else if (env.MOUSE_STATE.x<(int)lvl->paddle->x() - LIMIT) {
     sm->movePaddleLeft();
   }
 }

@@ -68,7 +68,7 @@ void Renderer::drawBackground() {
                            DISPLAY_WIDTH-SIDE_MARGIN,
                            DISPLAY_HEIGHT-TOP_MARGIN,
                            COLORS::BLACK);
-  al_draw_rectangle(12,12,DISPLAY_WIDTH-12,DISPLAY_HEIGHT-12,
+  al_draw_rectangle(LIMIT,LIMIT,DISPLAY_WIDTH-LIMIT,DISPLAY_HEIGHT-LIMIT,
                     COLORS::GREY_B,24);
 }
 void Renderer::drawGameInfo() {

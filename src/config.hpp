@@ -13,6 +13,8 @@ constexpr int FONT_SIZE = 15;
 constexpr const char* FONT_PATH = "resources/fonts/SourceCodePro-ExtraBold.ttf";
 constexpr const char* LEVELS_DIR = "resources/levels/";
 constexpr double FRAME_RATE = 1.0 / 60;
+constexpr int LIMIT = 12;
+
 
 extern bool LOG;
 extern uint LOG_LEVEL;

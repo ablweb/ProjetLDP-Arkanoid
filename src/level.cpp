@@ -14,6 +14,7 @@
 #include "config.hpp"
 #include "json.hpp"
 
+
 using json = nlohmann::json;
 
 // -------------------------------------------------------------------------
@@ -123,7 +124,7 @@ void Level::applyBonus(Bonus* bonus) {
         activeTimedBonuses.push_back({'C', 5.0f}); // Auto-release after 5 seconds
       }
       break;
-    case 'I': { // Interruption bonus : create 3 new balls
+    /*case 'I': { // Interruption bonus : create 3 new balls
       if (ball) {
         for (int i = 0; i < 3; ++i) {
           tpl newBallPos = {ball->x(), ball->y()};
@@ -143,7 +144,7 @@ void Level::applyBonus(Bonus* bonus) {
         }
       }
       break;
-    }
+    }*/
     default:
       std::cerr << "|Level::applyBonus -> Unknown bonus letter: " << letter << "\n";
       break;
@@ -196,10 +197,10 @@ void LevelLoader::loadDefault(Level* lvl) {
                                      lvl->getLivesRef());
   // Generate default level (tringular shape)
   using namespace BRICK_CONST;
-  for (uint col = 1;col <= 12;++col) {
+  for (uint col = 1;col <= LIMIT;++col) {
     int colorIndex = 50;
     uint start = 7;
-    uint end = start - (col <= (12+1)/2 ? col - 1 : 12 - col);
+    uint end = start - (col <= (LIMIT+1)/2 ? col - 1 : LIMIT - col);
     for (uint row = start;row >= end;--row) {
       lvl->bricks->addBrick({row, col, (colorType)colorIndex, none});
       colorIndex += 10;
