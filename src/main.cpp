@@ -10,7 +10,7 @@ uint LOG_LEVEL = 0;
 
 bool MOUSE = false;
 
-void parseArgs(int argc, char* argv[]) {
+void parseArgs(int argc, char* argv[]) { // Parses command line arguments to set logging and mouse options
   // any args are given
   if (argc > 1) {
     for (int i = 1; i < argc; ++i) {
@@ -35,7 +35,7 @@ void parseArgs(int argc, char* argv[]) {
   }
 }
 
-int main(int argc, char* argv[]) {
+int main(int argc, char* argv[]) { // Main function to initialize the game environment and start the game
   using namespace RETURN_CODE;
   parseArgs(argc, argv);
   // check if any errors occured during allegro environment initialization

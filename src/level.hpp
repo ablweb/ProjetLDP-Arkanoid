@@ -15,7 +15,7 @@ struct CollisionGroup {
   std::vector<Entity*> masked;
 };
 
-class Level {
+class Level { // Represents a game level containing bricks, paddle, ball, and bonuses
 private:
   int _lives;
   int _score;
@@ -53,7 +53,10 @@ std::vector<TimedBonus> activeTimedBonuses;
   std::vector<CollisionGroup> getColisionMasks() const;
 };
 
-class LevelLoader {
+class LevelLoader { // Loads levels from files and provides level data
+  // This class is responsible for reading level files, validating their format,
+  // and extracting the necessary data to create a Level object.
+  // It also provides methods to load default levels and reload level files.
  private:
   std::vector<std::string> levelNames;
   std::vector<std::vector<BRICK_CONST::Param>> levelDatas;

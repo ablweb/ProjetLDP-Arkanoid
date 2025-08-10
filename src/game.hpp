@@ -8,12 +8,12 @@ class Level;
 
 typedef std::unique_ptr<Controller> ControllerUPtr;
 
-class GameEngine {
+class GameEngine { // Main game engine class that manages the game loop and controller
 private:
-  ControllerUPtr controller;
+  ControllerUPtr controller; // Controller that handles game logic
 
-  void checkEnv();
-  void generateController();
+  void checkEnv(); // Check if the environment is initialized
+  void generateController(); // Generate the controller for the game
 
   bool running;
   void run();

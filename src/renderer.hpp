@@ -14,9 +14,9 @@ class Bonus;
 
 typedef std::shared_ptr<const Level> ConstLevelSPtr;
 
-class Renderer {
+class Renderer { // Responsible for rendering the game entities and UI elements
  private:
-  ConstLevelSPtr lvl;
+  ConstLevelSPtr lvl; // Pointer to the current level being rendered
   int _savedScore; // save the last score before lose
 
  public:

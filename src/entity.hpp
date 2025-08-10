@@ -11,7 +11,7 @@
 // -------------------------------------------------------------------------
 class CollisionRect;
 class CollisionCircle;
-class Entity {
+class Entity { // Base class for all entities in the game
 protected:
   Entity(tpl position);
   Entity(const Entity&) = default;
@@ -25,7 +25,7 @@ public:
 // -------------------------------------------------------------------------
 // DynamiqueEntity
 // -------------------------------------------------------------------------
-class DynamiqueEntity : public Entity {
+class DynamiqueEntity : public Entity { // Base class for entities that can move
 protected:
   DynamiqueEntity(tpl position);
   DynamiqueEntity(const DynamiqueEntity&) = default;
@@ -37,8 +37,8 @@ public:
 // -------------------------------------------------------------------------
 // CollisionRect
 // -------------------------------------------------------------------------
-class CollisionCircle;
-class CollisionRect {
+class CollisionCircle; 
+class CollisionRect { // Represents a rectangular collision area
 private:
   tpl   * _c_pos;
   float * _c_w;
@@ -62,7 +62,7 @@ void updateWidthPointer(float* newWidth);
 // -------------------------------------------------------------------------
 // CollisionCircle
 // -------------------------------------------------------------------------
-class CollisionCircle {
+class CollisionCircle { // Represents a circular collision area
 private:
   tpl   * _c_pos;
   float * _c_rad;
@@ -84,7 +84,7 @@ public:
 // Brick
 // -------------------------------------------------------------------------
 class BrickHolder;
-class Brick : public Entity, public CollisionRect {
+class Brick : public Entity, public CollisionRect { // Represents a brick in the game
 private:
   float _w = BRICK_CONST::width;
   float _h = BRICK_CONST::height;
@@ -121,7 +121,7 @@ public:
 // -------------------------------------------------------------------------
 class Level; 
 
-class BrickHolder {
+class BrickHolder { // Holds and manages a collection of bricks
 private:
   std::vector<Brick*> brickContainer;
   static constexpr int maxRow = 8;
@@ -144,7 +144,7 @@ public:
 // -------------------------------------------------------------------------
 // Paddle
 // -------------------------------------------------------------------------
-class Paddle : public DynamiqueEntity, public CollisionRect {
+class Paddle : public DynamiqueEntity, public CollisionRect { // Represents the paddle controlled by the player
  private:
   float _w,_h,_spd;
   ALLEGRO_COLOR _col;
@@ -167,7 +167,7 @@ class Paddle : public DynamiqueEntity, public CollisionRect {
 // -------------------------------------------------------------------------
 // Ball
 // -------------------------------------------------------------------------
-class Ball : public DynamiqueEntity, public CollisionCircle {
+class Ball : public DynamiqueEntity, public CollisionCircle { // Represents the ball in the game
  private:
   float _dx,_dy,_spd,_rad;
   ALLEGRO_COLOR _col;
@@ -211,7 +211,7 @@ class Ball : public DynamiqueEntity, public CollisionCircle {
 // Bonus
 // -------------------------------------------------------------------------
 
-class Bonus :  public DynamiqueEntity, public CollisionCircle {
+class Bonus :  public DynamiqueEntity, public CollisionCircle { // Represents a bonus item that falls from destroyed bricks
  private:
   float _velocityY;
   float _radius = 10.0f;
