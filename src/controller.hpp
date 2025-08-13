@@ -24,12 +24,12 @@ enum KEYS{LEFT,RIGHT,ACTION,NEXT,PREVIOUS,RELOAD,QUIT};
  * the game state, and manage levels. It encapsulates all input handling logic and 
  * ensures a seamless flow between game states.
  */
-class Controller {
+class Controller {  
  private:
-  StateManagerUPtr sm;
-  RendererUPtr rndr;
-  LevelSPtr lvl;
-  LevelLoaderUPtr loader;
+  StateManagerUPtr sm;  // Pointer to the state manager that handles game logic
+  RendererUPtr rndr; // Pointer to the renderer that handles graphics
+  LevelSPtr lvl; // Pointer to the current level being played
+  LevelLoaderUPtr loader; // Pointer to the level loader that manages levels
 
   bool keyState[7];
   void handleContiniousKeyPress();
@@ -37,7 +37,7 @@ class Controller {
   void restartGame();
   void loadNextLevel();
  public:
-  Controller(StateManagerUPtr, RendererUPtr, LevelSPtr);
+  Controller(StateManagerUPtr, RendererUPtr, LevelSPtr);  
   ~Controller();
 
   int currentLevel;

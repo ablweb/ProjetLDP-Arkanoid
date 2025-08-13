@@ -12,7 +12,7 @@ class Ball;
 class Bonus;
 
 
-typedef std::shared_ptr<const Level> ConstLevelSPtr;
+typedef std::shared_ptr<const Level> ConstLevelSPtr; // Shared pointer to a constant Level object
 
 class Renderer { // Responsible for rendering the game entities and UI elements
  private:

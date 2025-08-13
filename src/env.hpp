@@ -10,11 +10,11 @@ enum State{IN_GAME,VICTORY,LOSE};
 
 // https://stackoverflow.com/questions/1008019/how-do-you-implement-the-singleton-design-pattern
 // Singleton Design Pattern
-class Env {
+class Env { 
  public:
-  static Env& getInstance() {
-    static Env instance;
-    return instance;
+  static Env& getInstance() { // Get the single instance of Env
+    static Env instance; // Guaranteed to be destroyed.
+    return instance; // Instantiated on first use.
   }
  private:
   bool _isInit;

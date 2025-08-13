@@ -70,14 +70,10 @@ int Controller::handleInput() {
   if (env.EVENT.type == ALLEGRO_EVENT_KEY_UP) {
     switch (env.EVENT.keyboard.keycode) {
       case ALLEGRO_KEY_A:
-        if (LOG_LEVEL>=3)std::cerr<<"|Controller::handleInput() -> KEY_A_UP:LEFT\n";
-        keyState[LEFT] = false; break;
       case ALLEGRO_KEY_Q:
         if (LOG_LEVEL>=3)std::cerr<<"|Controller::handleInput() -> KEY_Q_UP:LEFT\n";
         keyState[LEFT] = false; break;
       case ALLEGRO_KEY_D:
-        if (LOG_LEVEL>=3)std::cerr<<"|Controller::handleInput() -> KEY_D_UP:RIGHT\n";
-        keyState[RIGHT] = false; break;
       case ALLEGRO_KEY_P:
         if (LOG_LEVEL>=3)std::cerr<<"|Controller::handleInput() -> KEY_P_UP:RIGHT\n";
         keyState[RIGHT] = false; break;
@@ -96,10 +92,10 @@ void Controller::handleMouse() { // Handles mouse movement to control the paddle
   }
 }
 
-void Controller::handleContiniousKeyPress() {
-  if (keyState[LEFT]) {
-    sm->movePaddleLeft();
-  } else if (keyState[RIGHT]) {
+void Controller::handleContiniousKeyPress() {   // Handles continuous key presses for paddle movement
+  if (keyState[LEFT]) { // If the left key is pressed, move the paddle left
+    sm->movePaddleLeft(); 
+  } else if (keyState[RIGHT]) { // If the right key is pressed, move the paddle right
     sm->movePaddleRight();
   }
 }
@@ -157,8 +153,8 @@ void Controller::loadLevel(bool next, bool reset) {
   }
 }
 
-void Controller::reloadLevels() {
-  loader->reloadFiles();
+void Controller::reloadLevels() { // Reload all levels from the file system
+  loader->reloadFiles();  
   try {
     loader->load((size_t)currentLevel,lvl.get(),true);
   } catch (const std::exception& err) {

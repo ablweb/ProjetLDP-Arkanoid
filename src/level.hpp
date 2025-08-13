@@ -10,7 +10,7 @@
 #include "entity.hpp"
 #include "utils.hpp"
 
-struct CollisionGroup {
+struct CollisionGroup { // Represents a group of entities that can collide with each other
   std::vector<Entity*> group;
   std::vector<Entity*> masked;
 };

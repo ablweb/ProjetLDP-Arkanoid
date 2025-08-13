@@ -14,7 +14,7 @@
 Env& env = Env::getInstance();
 State GAME_STATE = IN_GAME;
 
-void Env::init() {
+void Env::init() { // Initialize the environment
   FONT = nullptr;
   FONT_HUGE = nullptr;
   DISPLAY = nullptr;
@@ -26,7 +26,7 @@ void Env::init() {
   _isInit = true;
 }
 
-void Env::cleanup() {
+void Env::cleanup() { // Cleanup the environment
   if (FONT) al_destroy_font(FONT);
   if (FONT_HUGE) al_destroy_font(FONT_HUGE);
   if (DISPLAY) al_destroy_display(DISPLAY);
@@ -36,9 +36,9 @@ void Env::cleanup() {
   al_uninstall_mouse();
 }
 
-bool Env::isInitialized() { return _isInit; }
+bool Env::isInitialized() { return _isInit; } // Check if the environment is initialized
 
-void Env::initAddons() {
+void Env::initAddons() { // Initialize Allegro addons
   if (!al_init())
     throw std::runtime_error("Error while initializing Allegro\n");
   if (!al_init_primitives_addon())
